@@ -13,6 +13,11 @@ class ServiceOrder extends Model
         return $this->belongsTo(Vehicle::class);
     }
 
+    public function invoice()
+    {
+        return $this->hasOne(Invoice::class);
+    }
+
     public function customer()
     {
         return $this->belongsTo(Customer::class);
@@ -21,10 +26,5 @@ class ServiceOrder extends Model
     public function workItems()
     {
         return $this->hasMany(WorkItem::class);
-    }
-
-    public function invoice()
-    {
-        return $this->hasOne(Invoice::class);
     }
 }

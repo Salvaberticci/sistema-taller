@@ -1,8 +1,16 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-bold text-2xl text-white leading-tight">
-            {{ __('Inversiones Dios es Amor 31 C. A.') }}
-        </h2>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <h2 class="font-bold text-2xl text-white leading-tight">
+                {{ __('Inversiones Dios es Amor 31 C. A.') }}
+            </h2>
+            <a href="{{ route('reports.dashboard') }}" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-500/20 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                Reporte General
+            </a>
+        </div>
     </x-slot>
 
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
@@ -12,7 +20,7 @@
             <div class="premium-card p-6 rounded-2xl shadow-lg flex items-center justify-between">
                 <div>
                     <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ventas del Mes</p>
-                    <h3 class="text-2xl font-bold text-white mt-1">${{ number_format($monthlySales, 2) }}</h3>
+                    <h3 class="mt-1">@money($monthlySales)</h3>
                     <p class="text-xs text-green-400 font-bold mt-2">Facturación actual</p>
                 </div>
                 <div class="bg-blue-600/20 p-3 rounded-xl">
@@ -51,15 +59,19 @@
             </div>
 
             <!-- Stat Card 4 -->
-            <div class="premium-card p-6 rounded-2xl shadow-lg flex items-center justify-between">
+            <div class="premium-card p-6 rounded-2xl shadow-lg flex items-center justify-between {{ $criticalStockCount > 0 ? 'border border-red-500/50' : '' }}">
                 <div>
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Estado Sistema</p>
-                    <h3 class="text-2xl font-bold text-white mt-1">Online</h3>
-                    <p class="text-xs text-green-400 font-bold mt-2">Conectado a la base de datos</p>
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Inventario</p>
+                    <h3 class="text-2xl font-bold {{ $criticalStockCount > 0 ? 'text-red-400' : 'text-white' }} mt-1">
+                        {{ $criticalStockCount }} Críticos
+                    </h3>
+                    <p class="text-xs {{ $criticalStockCount > 0 ? 'text-red-500 animate-pulse' : 'text-green-400' }} font-bold mt-2">
+                        {{ $criticalStockCount > 0 ? 'Reponer repuestos pronto' : 'Stock bajo control' }}
+                    </p>
                 </div>
-                <div class="bg-green-600/20 p-3 rounded-xl">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                <div class="{{ $criticalStockCount > 0 ? 'bg-red-600/20' : 'bg-green-600/20' }} p-3 rounded-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 {{ $criticalStockCount > 0 ? 'text-red-500' : 'text-green-500' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                     </svg>
                 </div>
             </div>
@@ -95,7 +107,7 @@
                                             {{ $order->status == 'pending' ? 'EN PROCESO' : 'COMPLETADA' }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 text-sm font-bold text-white">${{ number_format($order->total_amount, 2) }}</td>
+                                    <td class="px-6 py-4">@money($order->total_amount)</td>
                                 </tr>
                             @empty
                                 <tr>
