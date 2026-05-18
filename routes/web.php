@@ -7,6 +7,15 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+Route::get('/clear-cache', function () {
+    try {
+        \Artisan::call('optimize:clear');
+        return '¡Caché limpiada y paquetes redescubiertos con éxito!';
+    } catch (\Exception $e) {
+        return 'Error al limpiar caché: ' . $e->getMessage();
+    }
+});
+
 Route::get('/dashboard', function () {
     $monthlySales = \App\Models\ServiceOrder::whereYear('created_at', now()->year)
         ->whereMonth('created_at', now()->month)
