@@ -16,6 +16,70 @@ Route::get('/clear-cache', function () {
     }
 });
 
+Route::get('/fix-storage', function () {
+    try {
+        $publicStoragePath = public_path('storage');
+        $messages = [];
+
+        // 1. Asegurar que las carpetas de almacenamiento existan
+        $storagePublic = storage_path('app/public');
+        if (!file_exists($storagePublic)) {
+            mkdir($storagePublic, 0755, true);
+            $messages[] = 'Creada carpeta storage/app/public';
+        }
+
+        // 2. Eliminar enlace/directorio previo si existe
+        if (file_exists($publicStoragePath) || is_link($publicStoragePath)) {
+            if (is_link($publicStoragePath)) {
+                unlink($publicStoragePath);
+                $messages[] = 'Eliminado enlace simbólico viejo public/storage';
+            } else {
+                // Si es un directorio real por error de carga manual
+                $backupName = $publicStoragePath . '_backup_' . time();
+                rename($publicStoragePath, $backupName);
+                $messages[] = "Directorio real public/storage renombrado a {$backupName}";
+            }
+        }
+
+        // 3. Recrear el enlace simbólico
+        \Artisan::call('storage:link');
+        $messages[] = 'Enlace simbólico recreado mediante storage:link';
+
+        // 4. Corregir permisos recursivamente a 755 (directorios) y 644 (archivos)
+        $dirsToFix = [
+            storage_path(),
+            storage_path('app'),
+            storage_path('app/public')
+        ];
+
+        foreach ($dirsToFix as $dir) {
+            if (file_exists($dir)) {
+                chmod($dir, 0755);
+            }
+        }
+
+        if (file_exists($storagePublic)) {
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($storagePublic, \RecursiveDirectoryIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::SELF_FIRST
+            );
+
+            foreach ($iterator as $item) {
+                if ($item->isDir()) {
+                    chmod($item->getPathname(), 0755);
+                } else {
+                    chmod($item->getPathname(), 0644);
+                }
+            }
+            $messages[] = 'Permisos corregidos a 755 para directorios y 644 para archivos dentro de storage/app/public';
+        }
+
+        return 'Operaciones completadas:<br>- ' . implode('<br>- ', $messages);
+    } catch (\Exception $e) {
+        return 'Error al corregir el almacenamiento: ' . $e->getMessage();
+    }
+});
+
 Route::get('/dashboard', function () {
     $monthlySales = \App\Models\ServiceOrder::whereYear('created_at', now()->year)
         ->whereMonth('created_at', now()->month)
