@@ -10,7 +10,7 @@ class AIController extends Controller
     public function chat(Request $request)
     {
         $message = $request->input('message');
-        $apiKey = env('GROQ_API_KEY');
+        $apiKey = config('services.groq.api_key');
 
         if (empty($apiKey)) {
             return response()->json([
