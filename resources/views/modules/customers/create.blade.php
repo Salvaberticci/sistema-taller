@@ -17,10 +17,16 @@
             <form action="{{ route('customers.store') }}" method="POST" class="space-y-6">
                 @csrf
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="md:col-span-2">
+                    <div>
                         <x-input-label for="name" :value="__('Nombre Completo')" />
                         <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" required autofocus placeholder="Ej. Juan Pérez" />
                         <x-input-error class="mt-2" :messages="$errors->get('name')" />
+                    </div>
+
+                    <div>
+                        <x-input-label for="id_card" :value="__('Cédula / RIF')" />
+                        <x-text-input id="id_card" name="id_card" type="text" class="mt-1 block w-full" :value="old('id_card')" placeholder="Ej. V-12345678" />
+                        <x-input-error class="mt-2" :messages="$errors->get('id_card')" />
                     </div>
 
                     <div>

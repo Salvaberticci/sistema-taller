@@ -17,4 +17,17 @@ class Vehicle extends Model
     {
         return $this->hasMany(ServiceOrder::class);
     }
+
+    public function photos()
+    {
+        return $this->hasMany(VehiclePhoto::class);
+    }
+
+    /**
+     * Mutator to ensure license plates are always stored in uppercase.
+     */
+    public function setLicensePlateAttribute($value)
+    {
+        $this->attributes['license_plate'] = strtoupper($value);
+    }
 }

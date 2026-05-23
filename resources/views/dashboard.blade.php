@@ -4,12 +4,14 @@
             <h2 class="font-bold text-2xl text-white leading-tight">
                 {{ __('Inversiones Dios es Amor 31 C. A.') }}
             </h2>
-            <a href="{{ route('reports.dashboard') }}" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-500/20 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg>
-                Reporte General
-            </a>
+            @if(Auth::user()->role !== 'mechanic')
+                <a href="{{ route('reports.dashboard') }}" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-500/20 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    Reporte General
+                </a>
+            @endif
         </div>
     </x-slot>
 
@@ -17,18 +19,20 @@
         <!-- Stats Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Stat Card 1 -->
-            <div class="premium-card p-6 rounded-2xl shadow-lg flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ventas del Mes</p>
-                    <h3 class="mt-1">@money($monthlySales)</h3>
-                    <p class="text-xs text-green-400 font-bold mt-2">Facturación actual</p>
+            @if(Auth::user()->role !== 'mechanic')
+                <div class="premium-card p-6 rounded-2xl shadow-lg flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ventas del Mes</p>
+                        <h3 class="mt-1">@money($monthlySales)</h3>
+                        <p class="text-xs text-green-400 font-bold mt-2">Facturación actual</p>
+                    </div>
+                    <div class="bg-blue-600/20 p-3 rounded-xl">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
                 </div>
-                <div class="bg-blue-600/20 p-3 rounded-xl">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-            </div>
+            @endif
 
             <!-- Stat Card 2 -->
             <div class="premium-card p-6 rounded-2xl shadow-lg flex items-center justify-between">
@@ -45,18 +49,20 @@
             </div>
 
             <!-- Stat Card 3 -->
-            <div class="premium-card p-6 rounded-2xl shadow-lg flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Clientes</p>
-                    <h3 class="text-2xl font-bold text-white mt-1">{{ $customersCount }}</h3>
-                    <p class="text-xs text-purple-400 font-bold mt-2">Base de datos activa</p>
+            @if(Auth::user()->role !== 'mechanic')
+                <div class="premium-card p-6 rounded-2xl shadow-lg flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Clientes</p>
+                        <h3 class="text-2xl font-bold text-white mt-1">{{ $customersCount }}</h3>
+                        <p class="text-xs text-purple-400 font-bold mt-2">Base de datos activa</p>
+                    </div>
+                    <div class="bg-purple-600/20 p-3 rounded-xl">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                    </div>
                 </div>
-                <div class="bg-purple-600/20 p-3 rounded-xl">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                </div>
-            </div>
+            @endif
 
             <!-- Stat Card 4 -->
             <div class="premium-card p-6 rounded-2xl shadow-lg flex items-center justify-between {{ $criticalStockCount > 0 ? 'border border-red-500/50' : '' }}">

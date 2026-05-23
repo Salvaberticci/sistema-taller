@@ -22,6 +22,7 @@ class CustomerController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'id_card' => 'nullable|string|max:50',
             'email' => 'nullable|email|max:255',
             'phone' => 'required|string|max:20',
             'address' => 'nullable|string',
@@ -34,7 +35,7 @@ class CustomerController extends Controller
 
     public function show(Customer $customer)
     {
-        $customer->load('vehicles.serviceOrders');
+        $customer->load('vehicles.serviceOrders.workItems');
         return view('modules.customers.show', compact('customer'));
     }
 
@@ -47,6 +48,7 @@ class CustomerController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'id_card' => 'nullable|string|max:50',
             'email' => 'nullable|email|max:255',
             'phone' => 'required|string|max:20',
             'address' => 'nullable|string',

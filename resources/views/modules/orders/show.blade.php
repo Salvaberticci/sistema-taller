@@ -22,6 +22,7 @@
                         <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Cancelada</option>
                     </select>
                 </form>
+            @if(Auth::user()->role !== 'mechanic')
                 @if(!$order->invoice)
                     <form action="{{ route('invoices.store') }}" method="POST">
                         @csrf
@@ -31,6 +32,7 @@
                 @else
                     <a href="{{ route('invoices.show', $order->invoice) }}" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg">Ver Factura</a>
                 @endif
+            @endif
             </div>
         </div>
     </x-slot>
@@ -57,7 +59,9 @@
                                     <th class="px-6 py-4 text-center">Cant.</th>
                                     <th class="px-6 py-4 text-right">Unitario</th>
                                     <th class="px-6 py-4 text-right">Total</th>
-                                    <th class="px-6 py-4 text-center">Acciones</th>
+                                    @if(Auth::user()->role !== 'mechanic')
+                                        <th class="px-6 py-4 text-center">Acciones</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-800">
@@ -72,16 +76,18 @@
                                         <td class="px-6 py-4 text-center text-sm text-slate-300">{{ $item->quantity }}</td>
                                         <td class="px-6 py-4 text-right">@money($item->unit_price)</td>
                                         <td class="px-6 py-4 text-right">@money($item->total)</td>
-                                        <td class="px-6 py-4 text-center">
-                                            <form action="{{ route('orders.removeItem', $item) }}" method="POST" onsubmit="return confirm('¿Eliminar este item?')">
-                                                @csrf @method('DELETE')
-                                                <button type="submit" class="text-red-500 hover:text-red-400 transition-colors">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </button>
-                                            </form>
-                                        </td>
+                                        @if(Auth::user()->role !== 'mechanic')
+                                            <td class="px-6 py-4 text-center">
+                                                <form action="{{ route('orders.removeItem', $item) }}" method="POST" onsubmit="return confirm('¿Eliminar este item?')">
+                                                    @csrf @method('DELETE')
+                                                    <button type="submit" class="text-red-500 hover:text-red-400 transition-colors">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        @endif
                                     </tr>
                                 @empty
                                     <tr><td colspan="5" class="px-6 py-12 text-center text-slate-500">No hay items cargados en esta orden.</td></tr>
@@ -91,7 +97,9 @@
                                 <tr>
                                     <td colspan="3" class="px-6 py-6 text-right text-xs font-black text-slate-500 uppercase tracking-widest">Total de la Orden</td>
                                     <td class="px-6 py-6 text-right">@money($order->total_amount)</td>
-                                    <td></td>
+                                    @if(Auth::user()->role !== 'mechanic')
+                                        <td></td>
+                                    @endif
                                 </tr>
                             </tfoot>
                         </table>
@@ -99,48 +107,50 @@
                 </div>
 
                 <!-- Add Item Form -->
-                <div class="premium-card rounded-[2rem] p-8 border border-slate-700 bg-slate-800/20">
-                    <h3 class="text-lg font-bold text-white mb-6">Añadir Concepto a la Orden</h3>
-                    <form action="{{ route('orders.addItem', $order) }}" method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
-                        @csrf
-                        <div class="md:col-span-2">
-                            <x-input-label for="type" :value="__('Tipo de Item')" />
-                            <select id="type" name="type" class="mt-1 block w-full bg-slate-900 border-slate-700 rounded-xl text-white focus:ring-blue-500 p-3 text-sm" onchange="toggleItemType(this.value)">
-                                <option value="labor">Mano de Obra / Servicio</option>
-                                <option value="part">Repuesto de Inventario</option>
-                            </select>
-                        </div>
-                        <div>
-                            <x-input-label for="quantity" :value="__('Cantidad')" />
-                            <x-text-input id="quantity" name="quantity" type="number" step="0.01" class="mt-1 block w-full text-sm" value="1" required />
-                        </div>
-                        <div>
-                            <button type="submit" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl shadow-lg transition-all active:scale-95 text-xs uppercase tracking-widest">
-                                Añadir Item
-                            </button>
-                        </div>
+                @if(Auth::user()->role !== 'mechanic')
+                    <div class="premium-card rounded-[2rem] p-8 border border-slate-700 bg-slate-800/20">
+                        <h3 class="text-lg font-bold text-white mb-6">Añadir Concepto a la Orden</h3>
+                        <form action="{{ route('orders.addItem', $order) }}" method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+                            @csrf
+                            <div class="md:col-span-2">
+                                <x-input-label for="type" :value="__('Tipo de Item')" />
+                                <select id="type" name="type" class="mt-1 block w-full bg-slate-900 border-slate-700 rounded-xl text-white focus:ring-blue-500 p-3 text-sm" onchange="toggleItemType(this.value)">
+                                    <option value="labor">Mano de Obra / Servicio</option>
+                                    <option value="part">Repuesto de Inventario</option>
+                                </select>
+                            </div>
+                            <div>
+                                <x-input-label for="quantity" :value="__('Cantidad')" />
+                                <x-text-input id="quantity" name="quantity" type="number" step="0.01" class="mt-1 block w-full text-sm" value="1" required />
+                            </div>
+                            <div>
+                                <button type="submit" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl shadow-lg transition-all active:scale-95 text-xs uppercase tracking-widest">
+                                    Añadir Item
+                                </button>
+                            </div>
 
-                        <div class="md:col-span-3" id="description_container">
-                            <x-input-label for="description" :value="__('Descripción / Nombre del Servicio')" />
-                            <x-text-input id="description" name="description" type="text" class="mt-1 block w-full text-sm" placeholder="Ej: Cambio de Frenos Delanteros" />
-                        </div>
+                            <div class="md:col-span-3" id="description_container">
+                                <x-input-label for="description" :value="__('Descripción / Nombre del Servicio')" />
+                                <x-text-input id="description" name="description" type="text" class="mt-1 block w-full text-sm" placeholder="Ej: Cambio de Frenos Delanteros" />
+                            </div>
 
-                        <div class="md:col-span-3 hidden" id="parts_container">
-                            <x-input-label for="part_select" :value="__('Seleccionar Repuesto')" />
-                            <select id="part_select" class="mt-1 block w-full bg-slate-900 border-slate-700 rounded-xl text-white focus:ring-blue-500 p-3 text-sm" onchange="updatePartPrice(this)">
-                                <option value="">-- Buscar repuesto --</option>
-                                @foreach($parts as $part)
-                                    <option value="{{ $part->name }}" data-price="{{ $part->price }}">{{ $part->name }} (Stock: {{ $part->stock }}) - ${{ $part->price }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                            <div class="md:col-span-3 hidden" id="parts_container">
+                                <x-input-label for="part_select" :value="__('Seleccionar Repuesto')" />
+                                <select id="part_select" class="mt-1 block w-full bg-slate-900 border-slate-700 rounded-xl text-white focus:ring-blue-500 p-3 text-sm" onchange="updatePartPrice(this)">
+                                    <option value="">-- Buscar repuesto --</option>
+                                    @foreach($parts as $part)
+                                        <option value="{{ $part->name }}" data-price="{{ $part->price }}">{{ $part->name }} (Stock: {{ $part->stock }}) - ${{ $part->price }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                        <div>
-                            <x-input-label for="unit_price" :value="__('Precio Unitario ($)')" />
-                            <x-text-input id="unit_price" name="unit_price" type="number" step="0.01" class="mt-1 block w-full text-sm" required />
-                        </div>
-                    </form>
-                </div>
+                            <div>
+                                <x-input-label for="unit_price" :value="__('Precio Unitario ($)')" />
+                                <x-text-input id="unit_price" name="unit_price" type="number" step="0.01" class="mt-1 block w-full text-sm" required />
+                            </div>
+                        </form>
+                    </div>
+                @endif
             </div>
 
             <div class="space-y-8">

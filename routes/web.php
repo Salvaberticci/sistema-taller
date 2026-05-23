@@ -45,32 +45,70 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Módulos del Sistema
-    Route::resource('/clientes', \App\Http\Controllers\CustomerController::class)->names('customers')->parameters(['clientes' => 'customer']);
-    Route::resource('/vehiculos', \App\Http\Controllers\VehicleController::class)->names('vehicles')->parameters(['vehiculos' => 'vehicle']);
-    Route::resource('/ordenes', \App\Http\Controllers\ServiceOrderController::class)->names('orders')->parameters(['ordenes' => 'order']);
-    Route::post('/ordenes/{order}/items', [\App\Http\Controllers\ServiceOrderController::class, 'addItem'])->name('orders.addItem');
-    Route::delete('/ordenes/items/{workItem}', [\App\Http\Controllers\ServiceOrderController::class, 'removeItem'])->name('orders.removeItem');
-    Route::patch('/ordenes/{order}/status', [\App\Http\Controllers\ServiceOrderController::class, 'updateStatus'])->name('orders.updateStatus');
-    Route::resource('/inventario', \App\Http\Controllers\PartController::class)->names('inventory')->parameters(['inventario' => 'part']);
-    Route::resource('/facturacion', \App\Http\Controllers\InvoiceController::class)->names('invoices')->parameters(['facturacion' => 'invoice']);
-    Route::post('/facturacion/{invoice}/pagar', [\App\Http\Controllers\InvoiceController::class, 'addPayment'])->name('invoices.payment');
-    Route::resource('/personal', \App\Http\Controllers\StaffController::class)->names('staff')->parameters(['personal' => 'staff']);
-    Route::resource('/citas', \App\Http\Controllers\AppointmentController::class)->names('appointments')->parameters(['citas' => 'appointment']);
+    // ─── Rutas exclusivas del Administrador ───
+    Route::middleware('role:admin')->group(function () {
+        // Personal
+        Route::resource('/personal', \App\Http\Controllers\StaffController::class)->names('staff')->parameters(['personal' => 'staff']);
 
-    Route::get('/ai-chat', [\App\Http\Controllers\AIController::class, 'index'])->name('ai.chat');
-    Route::post('/ai-chat/send', [\App\Http\Controllers\AIController::class, 'chat'])->name('ai.send');
+        // Facturación y Pagos
+        Route::resource('/facturacion', \App\Http\Controllers\InvoiceController::class)->names('invoices')->parameters(['facturacion' => 'invoice']);
+        Route::post('/facturacion/{invoice}/pagar', [\App\Http\Controllers\InvoiceController::class, 'addPayment'])->name('invoices.payment');
+        Route::patch('/pagos/{payment}/confirmar', [\App\Http\Controllers\InvoiceController::class, 'confirmPayment'])->name('payments.confirm');
+        Route::patch('/pagos/{payment}/rechazar', [\App\Http\Controllers\InvoiceController::class, 'rejectPayment'])->name('payments.reject');
+        Route::get('/pagos/historial', [\App\Http\Controllers\InvoiceController::class, 'paymentHistory'])->name('payments.history');
 
-    // Report Routes
-    Route::get('/reportes/dashboard', [\App\Http\Controllers\ReportController::class, 'dashboard'])->name('reports.dashboard');
-    Route::get('/reportes/inventario', [\App\Http\Controllers\ReportController::class, 'inventory'])->name('reports.inventory');
-    Route::get('/reportes/ordenes', [\App\Http\Controllers\ReportController::class, 'orders'])->name('reports.orders');
-    Route::get('/reportes/facturas', [\App\Http\Controllers\ReportController::class, 'invoices'])->name('reports.invoices');
-    Route::get('/reportes/personal', [\App\Http\Controllers\ReportController::class, 'staff'])->name('reports.staff');
-    Route::get('/reportes/clientes', [\App\Http\Controllers\ReportController::class, 'customers'])->name('reports.customers');
-    Route::get('/reportes/vehiculos', [\App\Http\Controllers\ReportController::class, 'vehicles'])->name('reports.vehicles');
-    Route::get('/reportes/agenda', [\App\Http\Controllers\ReportController::class, 'appointments'])->name('reports.appointments');
-    Route::get('/reportes/factura/{invoice}', [\App\Http\Controllers\ReportController::class, 'invoice'])->name('reports.invoice');
+        // Escritura de Inventario (crear, editar, eliminar repuestos)
+        Route::get('/inventario/create', [\App\Http\Controllers\PartController::class, 'create'])->name('inventory.create');
+        Route::post('/inventario/store', [\App\Http\Controllers\PartController::class, 'store'])->name('inventory.store');
+        Route::get('/inventario/{part}/edit', [\App\Http\Controllers\PartController::class, 'edit'])->name('inventory.edit');
+        Route::put('/inventario/{part}/update', [\App\Http\Controllers\PartController::class, 'update'])->name('inventory.update');
+        Route::delete('/inventario/{part}/destroy', [\App\Http\Controllers\PartController::class, 'destroy'])->name('inventory.destroy');
+
+        // Todos los reportes PDF
+        Route::get('/reportes/dashboard', [\App\Http\Controllers\ReportController::class, 'dashboard'])->name('reports.dashboard');
+        Route::get('/reportes/inventario', [\App\Http\Controllers\ReportController::class, 'inventory'])->name('reports.inventory');
+        Route::get('/reportes/ordenes', [\App\Http\Controllers\ReportController::class, 'orders'])->name('reports.orders');
+        Route::get('/reportes/facturas', [\App\Http\Controllers\ReportController::class, 'invoices'])->name('reports.invoices');
+        Route::get('/reportes/personal', [\App\Http\Controllers\ReportController::class, 'staff'])->name('reports.staff');
+        Route::get('/reportes/clientes', [\App\Http\Controllers\ReportController::class, 'customers'])->name('reports.customers');
+        Route::get('/reportes/vehiculos', [\App\Http\Controllers\ReportController::class, 'vehicles'])->name('reports.vehicles');
+        Route::get('/reportes/agenda', [\App\Http\Controllers\ReportController::class, 'appointments'])->name('reports.appointments');
+        Route::get('/reportes/factura/{invoice}', [\App\Http\Controllers\ReportController::class, 'invoice'])->name('reports.invoice');
+    });
+
+    // ─── Rutas compartidas: Administrador y Recepcionista ───
+    Route::middleware('role:admin,receptionist')->group(function () {
+        Route::resource('/clientes', \App\Http\Controllers\CustomerController::class)->names('customers')->parameters(['clientes' => 'customer']);
+        Route::resource('/vehiculos', \App\Http\Controllers\VehicleController::class)->names('vehicles')->parameters(['vehiculos' => 'vehicle']);
+        Route::post('/vehiculos/{vehicle}/fotos', [\App\Http\Controllers\VehicleController::class, 'storePhotos'])->name('vehicles.photos.store');
+        Route::delete('/vehiculos/fotos/{photo}', [\App\Http\Controllers\VehicleController::class, 'destroyPhoto'])->name('vehicles.photos.destroy');
+        Route::resource('/citas', \App\Http\Controllers\AppointmentController::class)->names('appointments')->parameters(['citas' => 'appointment']);
+
+        // Administración de órdenes (crear, editar, eliminar, items)
+        Route::get('/ordenes/crear/nueva', [\App\Http\Controllers\ServiceOrderController::class, 'create'])->name('orders.create');
+        Route::post('/ordenes/guardar', [\App\Http\Controllers\ServiceOrderController::class, 'store'])->name('orders.store');
+        Route::get('/ordenes/{order}/editar', [\App\Http\Controllers\ServiceOrderController::class, 'edit'])->name('orders.edit');
+        Route::put('/ordenes/{order}/actualizar', [\App\Http\Controllers\ServiceOrderController::class, 'update'])->name('orders.update');
+        Route::delete('/ordenes/{order}/eliminar', [\App\Http\Controllers\ServiceOrderController::class, 'destroy'])->name('orders.destroy');
+        Route::post('/ordenes/{order}/items', [\App\Http\Controllers\ServiceOrderController::class, 'addItem'])->name('orders.addItem');
+        Route::delete('/ordenes/items/{workItem}', [\App\Http\Controllers\ServiceOrderController::class, 'removeItem'])->name('orders.removeItem');
+    });
+
+    // ─── Rutas accesibles por todos los roles ───
+    Route::middleware('role:admin,receptionist,mechanic')->group(function () {
+        // IA
+        Route::get('/ai-chat', [\App\Http\Controllers\AIController::class, 'index'])->name('ai.chat');
+        Route::post('/ai-chat/send', [\App\Http\Controllers\AIController::class, 'chat'])->name('ai.send');
+
+        // Inventario (solo lectura)
+        Route::get('/inventario', [\App\Http\Controllers\PartController::class, 'index'])->name('inventory.index');
+        Route::get('/inventario/{part}', [\App\Http\Controllers\PartController::class, 'show'])->name('inventory.show');
+
+        // Órdenes de trabajo (ver y actualizar estado)
+        Route::get('/ordenes', [\App\Http\Controllers\ServiceOrderController::class, 'index'])->name('orders.index');
+        Route::get('/ordenes/{order}', [\App\Http\Controllers\ServiceOrderController::class, 'show'])->name('orders.show');
+        Route::patch('/ordenes/{order}/status', [\App\Http\Controllers\ServiceOrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    });
 });
 
 require __DIR__.'/auth.php';

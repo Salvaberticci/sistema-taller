@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('MecaniSmart AI Assistant') }}
+            {{ __('Asistente de IA') }}
         </h2>
     </x-slot>
 
@@ -19,7 +19,6 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-lg">Asistente Técnico IA</h3>
-                                <p class="text-xs text-blue-100 uppercase tracking-widest font-semibold">Potenciado por Llama 3</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
@@ -117,7 +116,7 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
             try {
-                const response = await fetch('/ai-chat/send', {
+                const response = await fetch('{{ route("ai.send") }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

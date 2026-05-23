@@ -14,7 +14,7 @@
 
     <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
         <div class="premium-card rounded-[2.5rem] p-8 shadow-2xl border border-slate-700">
-            <form action="{{ route('vehicles.store') }}" method="POST" class="space-y-6">
+            <form action="{{ route('vehicles.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="md:col-span-2">
@@ -48,7 +48,7 @@
 
                     <div>
                         <x-input-label for="license_plate" :value="__('Placa / Patente')" />
-                        <x-text-input id="license_plate" name="license_plate" type="text" class="mt-1 block w-full" required placeholder="ABC-123" />
+                        <x-text-input id="license_plate" name="license_plate" type="text" class="mt-1 block w-full uppercase" required placeholder="ABC-123" style="text-transform: uppercase;" />
                         <x-input-error class="mt-2" :messages="$errors->get('license_plate')" />
                     </div>
 
@@ -65,6 +65,24 @@
                     </div>
                 </div>
 
+                <!-- Subir fotos al crear -->
+                <div class="border-t border-slate-700 pt-6">
+                    <x-input-label :value="__('Fotos del Vehículo (Opcional)')" />
+                    <div id="create-drop-zone" class="mt-2 border-2 border-dashed border-slate-600 hover:border-blue-500 rounded-2xl p-6 text-center transition-colors duration-300 cursor-pointer" onclick="document.getElementById('create-photo-input').click()">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto text-slate-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <p class="text-slate-400 text-sm font-medium">Clic o arrastra fotos aquí para seleccionarlas</p>
+                            <p class="text-slate-600 text-xs mt-1">Formatos permitidos: JPG, PNG, GIF, WEBP</p>
+                        </div>
+                        <div id="create-preview" class="grid grid-cols-4 gap-3 mt-3 hidden" onclick="event.stopPropagation()"></div>
+                    </div>
+                    <input id="create-photo-input" type="file" name="photos[]" multiple accept="image/*" class="hidden" onchange="previewCreatePhotos(this)">
+                    <x-input-error class="mt-2" :messages="$errors->get('photos')" />
+                    <x-input-error class="mt-2" :messages="\Illuminate\Support\Arr::flatten($errors->get('photos.*'))" />
+                </div>
+
                 <div class="flex items-center justify-end mt-8 gap-4">
                     <a href="{{ route('vehicles.index') }}" class="text-sm font-bold text-slate-400 hover:text-white transition-colors">Cancelar</a>
                     <button type="submit" class="px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-lg shadow-blue-500/20 transition-all hover:scale-105 active:scale-95">
@@ -74,4 +92,53 @@
             </form>
         </div>
     </div>
+
+    <script>
+        function previewCreatePhotos(input) {
+            const container = document.getElementById('create-preview');
+            container.innerHTML = '';
+            if (input.files.length > 0) {
+                container.classList.remove('hidden');
+                Array.from(input.files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const div = document.createElement('div');
+                        div.className = 'relative w-full h-24 rounded-xl overflow-hidden border border-blue-500/30';
+                        div.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover" alt="Preview">`;
+                        container.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        // Drag and drop for Create Vehicle View
+        const createDropZone = document.getElementById('create-drop-zone');
+        const createPhotoInput = document.getElementById('create-photo-input');
+
+        if (createDropZone) {
+            ['dragenter', 'dragover'].forEach(event => {
+                createDropZone.addEventListener(event, (e) => {
+                    e.preventDefault();
+                    createDropZone.classList.add('border-blue-500', 'bg-blue-500/5');
+                });
+            });
+
+            ['dragleave', 'drop'].forEach(event => {
+                createDropZone.addEventListener(event, (e) => {
+                    e.preventDefault();
+                    createDropZone.classList.remove('border-blue-500', 'bg-blue-500/5');
+                });
+            });
+
+            createDropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                createPhotoInput.files = e.dataTransfer.files;
+                previewCreatePhotos(createPhotoInput);
+            });
+        }
+    </script>
 </x-app-layout>
+

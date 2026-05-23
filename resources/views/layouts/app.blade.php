@@ -26,23 +26,28 @@
             }
         </style>
     </head>
-    <body class="antialiased min-h-screen">
-        <div class="min-h-screen bg-[#0f172a]">
+    <body class="antialiased min-h-screen bg-[#0f172a]">
+        <div class="flex flex-col md:flex-row min-h-screen bg-[#0f172a]">
             @include('layouts.navigation')
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-[#1e293b] shadow-sm border-b border-slate-700">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
+            <!-- Main Content Area -->
+            <div class="flex-1 flex flex-col min-w-0">
+                <!-- Page Heading -->
+                @isset($header)
+                    <header class="bg-[#1e293b] shadow-sm border-b border-slate-700">
+                        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                            {{ $header }}
+                        </div>
+                    </header>
+                @endisset
 
-            <!-- Page Content -->
-            <main class="py-12">
-                {{ $slot }}
-            </main>
+                <!-- Page Content -->
+                <main class="flex-1 py-12 px-4 sm:px-6 lg:px-8">
+                    <div class="max-w-7xl mx-auto">
+                        {{ $slot }}
+                    </div>
+                </main>
+            </div>
         </div>
     </body>
 </html>

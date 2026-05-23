@@ -64,7 +64,14 @@
                                             {{ substr($customer->name, 0, 1) }}
                                         </div>
                                         <div>
-                                            <p class="text-sm font-bold text-white">{{ $customer->name }}</p>
+                                            <div class="flex items-center gap-2">
+                                                <p class="text-sm font-bold text-white">{{ $customer->name }}</p>
+                                                @if($customer->id_card)
+                                                    <span class="px-2 py-0.5 bg-slate-800 text-slate-400 text-[9px] font-bold rounded-md border border-slate-700">
+                                                        {{ $customer->id_card }}
+                                                    </span>
+                                                @endif
+                                            </div>
                                             <p class="text-[10px] text-slate-500 font-medium">{{ $customer->address }}</p>
                                         </div>
                                     </div>

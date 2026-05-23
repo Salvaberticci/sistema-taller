@@ -48,6 +48,15 @@ class InvoiceController extends Controller
         $validated = $request->validate([
             'amount' => 'required|numeric|min:0.01',
             'method' => 'required|string',
+            'reference' => 'nullable|string|max:255',
+            'notes' => 'nullable|string|max:1000',
+        ], [
+            'amount.required' => 'El monto es obligatorio.',
+            'amount.numeric' => 'El monto debe ser un valor numérico.',
+            'amount.min' => 'El monto mínimo es 0.01.',
+            'method.required' => 'El método de pago es obligatorio.',
+            'reference.max' => 'La referencia no puede exceder 255 caracteres.',
+            'notes.max' => 'Las notas no pueden exceder 1000 caracteres.',
         ]);
 
         Payment::create([
@@ -55,16 +64,85 @@ class InvoiceController extends Controller
             'amount' => $validated['amount'],
             'method' => $validated['method'],
             'payment_date' => now(),
+            'status' => 'pendiente',
+            'reference' => $validated['reference'] ?? null,
+            'notes' => $validated['notes'] ?? null,
         ]);
 
-        // Update invoice status
-        $totalPaid = $invoice->payments()->sum('amount');
-        if ($totalPaid >= $invoice->total) {
+        return back()->with('status', 'Pago registrado con éxito. Pendiente de confirmación.');
+    }
+
+    /**
+     * Confirmar un pago pendiente
+     */
+    public function confirmPayment(Payment $payment)
+    {
+        $payment->confirm();
+
+        // Recalcular el estado de la factura basado en pagos CONFIRMADOS
+        $invoice = $payment->invoice;
+        $totalConfirmed = $invoice->payments()->where('status', 'confirmado')->sum('amount');
+        
+        if ($totalConfirmed >= $invoice->total) {
             $invoice->update(['status' => 'paid']);
-        } elseif ($totalPaid > 0) {
+        } elseif ($totalConfirmed > 0) {
             $invoice->update(['status' => 'partially_paid']);
         }
 
-        return back()->with('status', 'Pago registrado con éxito.');
+        return back()->with('status', 'Pago confirmado exitosamente.');
+    }
+
+    /**
+     * Rechazar / anular un pago pendiente
+     */
+    public function rejectPayment(Payment $payment)
+    {
+        $payment->update(['status' => 'rechazado']);
+
+        // Recalcular el estado de la factura
+        $invoice = $payment->invoice;
+        $totalConfirmed = $invoice->payments()->where('status', 'confirmado')->sum('amount');
+        
+        if ($totalConfirmed >= $invoice->total) {
+            $invoice->update(['status' => 'paid']);
+        } elseif ($totalConfirmed > 0) {
+            $invoice->update(['status' => 'partially_paid']);
+        } else {
+            $invoice->update(['status' => 'unpaid']);
+        }
+
+        return back()->with('status', 'Pago rechazado.');
+    }
+
+    /**
+     * Historial global de pagos
+     */
+    public function paymentHistory(Request $request)
+    {
+        $query = Payment::with(['invoice.serviceOrder.customer'])
+            ->latest('payment_date');
+
+        // Filtro por estado
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filtro por método
+        if ($request->filled('method')) {
+            $query->where('method', $request->method);
+        }
+
+        $payments = $query->get();
+
+        // Estadísticas
+        $allPayments = Payment::all();
+        $totalRegistered = $allPayments->sum('amount');
+        $totalConfirmed = $allPayments->where('status', 'confirmado')->sum('amount');
+        $totalPending = $allPayments->where('status', 'pendiente')->sum('amount');
+        $totalRejected = $allPayments->where('status', 'rechazado')->sum('amount');
+
+        return view('modules.invoices.payment-history', compact(
+            'payments', 'totalRegistered', 'totalConfirmed', 'totalPending', 'totalRejected'
+        ));
     }
 }

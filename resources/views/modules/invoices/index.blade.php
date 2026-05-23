@@ -8,6 +8,12 @@
                     <p class="text-slate-400 text-sm mt-1">Gestión de ingresos, facturas y flujo de caja.</p>
                 </div>
                 <div class="flex gap-3">
+                    <a href="{{ route('payments.history') }}" class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-green-500/20 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        </svg>
+                        Historial de Pagos
+                    </a>
                     <a href="{{ route('reports.invoices') }}" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-500/20 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -103,8 +109,15 @@
                                 <td class="px-6 py-4 text-sm text-slate-500">{{ $invoice->issue_date }}</td>
                                 <td class="px-6 py-4">@money($invoice->total)</td>
                                 <td class="px-6 py-4">
-                                    <span class="px-3 py-1 {{ $invoice->status == 'paid' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-orange-500/10 text-orange-500 border-orange-500/20' }} text-[10px] font-black rounded-full border uppercase tracking-widest">
-                                        {{ $invoice->status == 'paid' ? 'PAGADO' : 'PENDIENTE' }}
+                                    @php
+                                        $sConfig = match($invoice->status) {
+                                            'paid' => ['class' => 'bg-green-500/10 text-green-500 border-green-500/20', 'label' => 'PAGADO'],
+                                            'partially_paid' => ['class' => 'bg-blue-500/10 text-blue-400 border-blue-500/20', 'label' => 'PARCIAL'],
+                                            default => ['class' => 'bg-orange-500/10 text-orange-500 border-orange-500/20', 'label' => 'PENDIENTE'],
+                                        };
+                                    @endphp
+                                    <span class="px-3 py-1 {{ $sConfig['class'] }} text-[10px] font-black rounded-full border uppercase tracking-widest">
+                                        {{ $sConfig['label'] }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
