@@ -13,7 +13,7 @@
 /.zed
 /auth.json
 /node_modules
-/public/build
+# /public/build  ← Descomentar si quieres regenerar en servidor con Node.js
 /public/hot
 /public/storage
 /storage/*.key
