@@ -124,12 +124,12 @@ class InvoiceController extends Controller
 
         // Filtro por estado
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            $query->where('status', $request->input('status'));
         }
 
         // Filtro por método
         if ($request->filled('method')) {
-            $query->where('method', $request->method);
+            $query->where('method', $request->input('method'));
         }
 
         $payments = $query->get();

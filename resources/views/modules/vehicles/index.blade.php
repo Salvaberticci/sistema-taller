@@ -33,7 +33,7 @@
 
         <div class="premium-card rounded-2xl shadow-xl overflow-hidden">
             <div class="p-6 border-b border-slate-700 bg-slate-800/30 flex flex-wrap gap-4 justify-between items-center">
-                <input type="text" placeholder="Buscar por placa, modelo o dueño..." 
+                <input type="text" id="search-input" placeholder="Buscar por placa, modelo o dueño..." 
                     class="block w-full md:w-96 px-4 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
             </div>
             <div class="overflow-x-auto">
@@ -100,4 +100,29 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            const rows = document.querySelectorAll('tbody tr');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const term = e.target.value.toLowerCase().trim();
+
+                    rows.forEach(row => {
+                        // Skip empty row
+                        if (row.querySelector('td[colspan]')) return;
+
+                        const text = row.textContent.toLowerCase();
+                        if (text.includes(term)) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            }
+        });
+    </script>
 </x-app-layout>

@@ -4,6 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property int $customer_id
+ * @property string $make
+ * @property string $model
+ * @property int $year
+ * @property string $license_plate
+ * @property string|null $vin
+ * @property string|null $color
+ * @property-read \App\Models\Customer $customer
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ServiceOrder[] $serviceOrders
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\VehiclePhoto[] $photos
+ */
 class Vehicle extends Model
 {
     protected $fillable = ['customer_id', 'make', 'model', 'year', 'license_plate', 'vin', 'color'];

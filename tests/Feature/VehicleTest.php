@@ -96,10 +96,10 @@ class VehicleTest extends TestCase
         $response->assertRedirect(route('vehicles.index'));
         
         $vehicle = Vehicle::where('license_plate', 'ABC-999-ZZ')->firstOrFail();
-        $this->assertCount(2, $vehicle->photos);
+        $this->assertCount(2, $vehicle->photos()->get());
 
         // Assert files were stored
-        foreach ($vehicle->photos as $photo) {
+        foreach ($vehicle->photos()->get() as $photo) {
             \Illuminate\Support\Facades\Storage::disk('public')->assertExists($photo->photo_path);
         }
     }
@@ -133,9 +133,9 @@ class VehicleTest extends TestCase
         $response->assertRedirect();
         
         $vehicle->refresh();
-        $this->assertCount(1, $vehicle->photos);
+        $this->assertCount(1, $vehicle->photos()->get());
         
-        $photo = $vehicle->photos->first();
+        $photo = $vehicle->photos()->first();
         \Illuminate\Support\Facades\Storage::disk('public')->assertExists($photo->photo_path);
     }
 }
