@@ -59,7 +59,27 @@
                         </div>
                         <div>
                             <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">VIN / Chasis</p>
-                            <p class="text-slate-300">{{ $vehicle->vin ?: 'No especificado' }}</p>
+                            <p class="text-slate-300 font-mono tracking-widest">{{ $vehicle->vin ?: 'No especificado' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Kilometraje</p>
+                            <p class="text-slate-300">{{ $vehicle->mileage ? number_format($vehicle->mileage) . ' km' : 'No registrado' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Nivel Combustible</p>
+                            <p class="text-slate-300">
+                                @switch($vehicle->fuel_level)
+                                    @case('empty') Vacío @break
+                                    @case('quarter') 1/4 @break
+                                    @case('half') 1/2 @break
+                                    @case('three_quarters') 3/4 @break
+                                    @default No registrado
+                                @endswitch
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Mecánico Encargado</p>
+                            <p class="text-slate-300">{{ $vehicle->assignedMechanic?->name ?: 'No asignado' }}</p>
                         </div>
                     </div>
                 </div>

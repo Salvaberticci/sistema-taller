@@ -41,7 +41,7 @@
                 <h4 class="mt-1">@money($parts->sum(fn($p) => $p->stock * $p->price))</h4>
             </div>
             <div class="premium-card p-4 rounded-2xl border-l-4 border-l-green-500">
-                <p class="text-[10px] font-black text-green-500 uppercase tracking-widest mb-1">Total Repuestos</p>
+                <p class="text-[10px] font-black text-green-500 uppercase tracking-widest mb-1">Productos Registrados</p>
                 <h4 class="text-2xl font-black text-white">{{ $parts->count() }}</h4>
             </div>
         </div>

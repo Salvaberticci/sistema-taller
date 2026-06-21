@@ -31,6 +31,19 @@
             </div>
         @endif
 
+        <!-- Tasa BCV -->
+        <div class="premium-card p-4 rounded-2xl border border-slate-700 bg-slate-800/30 mb-6 flex items-center gap-4">
+            <div class="w-10 h-10 bg-yellow-600/20 rounded-xl flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Tasa de Cambio BCV</p>
+                <p class="text-xl font-black text-white">Bs. {{ number_format($bcvRate, 2) }} <span class="text-sm font-bold text-slate-500">por USD</span></p>
+            </div>
+        </div>
+
         <!-- Finance Overview -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             @php
@@ -105,7 +118,12 @@
                         @forelse($invoices as $invoice)
                             <tr class="hover:bg-slate-800/30 transition-colors">
                                 <td class="px-6 py-4 font-bold text-white">{{ $invoice->number }}</td>
-                                <td class="px-6 py-4 text-sm text-slate-300">{{ $invoice->serviceOrder->customer->name }}</td>
+                                <td class="px-6 py-4">
+                                    <p class="text-sm font-bold text-white">{{ $invoice->serviceOrder->customer->name }}</p>
+                                    @if($invoice->serviceOrder->customer->id_card)
+                                        <p class="text-[10px] text-slate-500 font-mono">{{ $invoice->serviceOrder->customer->id_card }}</p>
+                                    @endif
+                                </td>
                                 <td class="px-6 py-4 text-sm text-slate-500">{{ $invoice->issue_date }}</td>
                                 <td class="px-6 py-4">@money($invoice->total)</td>
                                 <td class="px-6 py-4">

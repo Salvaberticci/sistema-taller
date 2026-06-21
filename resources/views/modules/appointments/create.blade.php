@@ -19,7 +19,7 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <x-input-label for="customer_id" :value="__('Seleccionar Cliente')" />
+                        <x-input-label for="customer_id" :value="__('Seleccionar Cliente')" required />
                         <select id="customer_id" name="customer_id" class="mt-1 block w-full bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all p-3" required onchange="updateVehicles(this.value)">
                             <option value="">-- Elija un cliente --</option>
                             @foreach($customers as $customer)
@@ -38,8 +38,9 @@
                     </div>
 
                     <div>
-                        <x-input-label for="scheduled_at" :value="__('Fecha y Hora')" />
+                        <x-input-label for="scheduled_at" :value="__('Fecha y Hora')" required />
                         <x-text-input id="scheduled_at" name="scheduled_at" type="datetime-local" class="mt-1 block w-full" required />
+                        <p class="text-xs text-slate-500 mt-1">Horario: Lun-Sáb, 8:00 am - 5:00 pm</p>
                         <x-input-error class="mt-2" :messages="$errors->get('scheduled_at')" />
                     </div>
 
@@ -54,14 +55,16 @@
 
                     <div class="md:col-span-2">
                         <x-input-label for="description" :value="__('Motivo de la Cita / Descripción')" />
-                        <textarea id="description" name="description" rows="3" class="mt-1 block w-full bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all p-3" placeholder="Ej. Cambio de aceite, revisión de frenos..."></textarea>
+                        <textarea id="description" name="description" rows="3" class="mt-1 block w-full bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all p-3" placeholder="Ej. Cambio de aceite, revisión de frenos..."></textarea>
                         <x-input-error class="mt-2" :messages="$errors->get('description')" />
                     </div>
                 </div>
 
                 <div class="flex items-center justify-end mt-8 gap-4">
-                    <a href="{{ route('appointments.index') }}" class="text-sm font-bold text-slate-400 hover:text-white transition-colors">Cancelar</a>
-                    <button type="submit" class="px-10 py-4 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-2xl shadow-lg shadow-purple-500/20 transition-all hover:scale-105 active:scale-95">
+                    <a href="{{ route('appointments.index') }}" class="px-6 py-3 border-2 border-slate-600 text-slate-300 font-bold rounded-xl hover:bg-slate-700 hover:text-white transition-all text-sm">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="px-10 py-4 bg-purple-600 hover:bg-purple-500 text-white font-black rounded-2xl shadow-lg shadow-purple-500/30 transition-all hover:scale-105 active:scale-95">
                         Agendar Cita
                     </button>
                 </div>
@@ -95,5 +98,36 @@
                 vehicleSelect.disabled = true;
             }
         }
+
+        // Limitar el selector de fecha/hora
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('scheduled_at');
+            if (input) {
+                const now = new Date();
+                // Formatear a datetime-local string (yyyy-MM-ddTHH:mm)
+                const pad = (n) => n.toString().padStart(2, '0');
+                const min = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+                input.setAttribute('min', min);
+
+                input.addEventListener('change', function() {
+                    const val = new Date(this.value);
+                    if (isNaN(val.getTime())) return;
+
+                    // Bloquear domingos
+                    if (val.getDay() === 0) {
+                        alert('No se pueden agendar citas los domingos.');
+                        this.value = '';
+                        return;
+                    }
+
+                    const hour = val.getHours();
+                    if (hour < 8 || hour >= 17) {
+                        alert('El horario de atención es de 8:00 am a 5:00 pm.');
+                        this.value = '';
+                        return;
+                    }
+                });
+            }
+        });
     </script>
 </x-app-layout>

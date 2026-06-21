@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\ServiceOrder;
 use App\Models\Part;
+use App\Models\User;
 use App\Models\WorkItem;
 use Illuminate\Http\Request;
 
@@ -19,7 +20,8 @@ class ServiceOrderController extends Controller
     public function create()
     {
         $customers = Customer::with('vehicles')->orderBy('name')->get();
-        return view('modules.orders.create', compact('customers'));
+        $mechanics = User::where('role', 'mecanico')->orWhere('role', 'mechanic')->orderBy('name')->get();
+        return view('modules.orders.create', compact('customers', 'mechanics'));
     }
 
     public function store(Request $request)

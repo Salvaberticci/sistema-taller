@@ -19,14 +19,25 @@
                 @method('PUT')
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <x-input-label for="name" :value="__('Nombre Completo')" />
+                        <x-input-label for="name" :value="__('Nombre Completo')" required />
                         <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $customer->name)" required autofocus placeholder="Ej. Juan Pérez" />
                         <x-input-error class="mt-2" :messages="$errors->get('name')" />
                     </div>
 
                     <div>
-                        <x-input-label for="id_card" :value="__('Cédula / RIF')" />
-                        <x-text-input id="id_card" name="id_card" type="text" class="mt-1 block w-full" :value="old('id_card', $customer->id_card)" placeholder="Ej. V-12345678" />
+                        @php
+                            $idCardParsed = $customer->id_card ? (str_contains($customer->id_card, '-') ? explode('-', $customer->id_card, 2) : ['V', $customer->id_card]) : ['V', ''];
+                        @endphp
+                        <x-input-label for="id_card_type" :value="__('Cédula / RIF')" />
+                        <div class="flex gap-2 mt-1">
+                            <select id="id_card_type" name="id_card_type" class="w-20 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all px-3">
+                                <option value="V" {{ old('id_card_type', $idCardParsed[0]) == 'V' ? 'selected' : '' }}>V</option>
+                                <option value="J" {{ old('id_card_type', $idCardParsed[0]) == 'J' ? 'selected' : '' }}>J</option>
+                                <option value="E" {{ old('id_card_type', $idCardParsed[0]) == 'E' ? 'selected' : '' }}>E</option>
+                                <option value="G" {{ old('id_card_type', $idCardParsed[0]) == 'G' ? 'selected' : '' }}>G</option>
+                            </select>
+                            <x-text-input id="id_card" name="id_card" type="text" class="flex-1" :value="old('id_card', $idCardParsed[1])" placeholder="12345678" />
+                        </div>
                         <x-input-error class="mt-2" :messages="$errors->get('id_card')" />
                     </div>
 
@@ -37,21 +48,23 @@
                     </div>
 
                     <div>
-                        <x-input-label for="phone" :value="__('Teléfono / WhatsApp')" />
+                        <x-input-label for="phone" :value="__('Teléfono / WhatsApp')" required />
                         <x-text-input id="phone" name="phone" type="text" class="mt-1 block w-full" :value="old('phone', $customer->phone)" required placeholder="+58 412..." />
                         <x-input-error class="mt-2" :messages="$errors->get('phone')" />
                     </div>
 
                     <div class="md:col-span-2">
                         <x-input-label for="address" :value="__('Dirección')" />
-                        <textarea id="address" name="address" class="mt-1 block w-full bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all p-4" rows="3" placeholder="Dirección de habitación o trabajo...">{{ old('address', $customer->address) }}</textarea>
+                        <textarea id="address" name="address" class="mt-1 block w-full bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all p-4" rows="3" placeholder="Dirección de habitación o trabajo...">{{ old('address', $customer->address) }}</textarea>
                         <x-input-error class="mt-2" :messages="$errors->get('address')" />
                     </div>
                 </div>
 
                 <div class="flex items-center justify-end mt-8 gap-4">
-                    <a href="{{ route('customers.index') }}" class="text-sm font-bold text-slate-400 hover:text-white transition-colors">Cancelar</a>
-                    <button type="submit" class="px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-lg shadow-blue-500/20 transition-all hover:scale-105 active:scale-95">
+                    <a href="{{ route('customers.index') }}" class="px-6 py-3 border-2 border-slate-600 text-slate-300 font-bold rounded-xl hover:bg-slate-700 hover:text-white transition-all text-sm">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="px-10 py-4 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl shadow-lg shadow-blue-500/30 transition-all hover:scale-105 active:scale-95">
                         Actualizar Cliente
                     </button>
                 </div>

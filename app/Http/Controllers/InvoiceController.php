@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\ServiceOrder;
+use App\Services\CurrencyService;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
@@ -12,7 +13,8 @@ class InvoiceController extends Controller
     public function index()
     {
         $invoices = Invoice::with(['serviceOrder.customer', 'payments'])->latest()->get();
-        return view('modules.invoices.index', compact('invoices'));
+        $bcvRate = CurrencyService::getBcvRate();
+        return view('modules.invoices.index', compact('invoices', 'bcvRate'));
     }
 
     public function show(Invoice $invoice)

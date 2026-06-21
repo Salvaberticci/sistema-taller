@@ -25,7 +25,24 @@ class AppointmentController extends Controller
         $validated = $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'vehicle_id' => 'nullable|exists:vehicles,id',
-            'scheduled_at' => 'required|date|after:now',
+            'scheduled_at' => [
+                'required',
+                'date',
+                'after:now',
+                function ($attribute, $value, $fail) {
+                    $date = \Carbon\Carbon::parse($value);
+                    // No domingos
+                    if ($date->isSunday()) {
+                        $fail('No se pueden agendar citas los domingos.');
+                        return;
+                    }
+                    // Horario laboral 8am - 5pm
+                    $hour = (int) $date->format('H');
+                    if ($hour < 8 || $hour >= 17) {
+                        $fail('El horario de atención es de 8:00 am a 5:00 pm.');
+                    }
+                },
+            ],
             'status' => 'required|in:scheduled,confirmed,completed,cancelled',
             'description' => 'nullable|string',
         ]);
