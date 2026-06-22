@@ -31,8 +31,20 @@
                     </div>
 
                     <div>
+                        <x-input-label for="model_id" :value="__('Modelo')" required />
+                        <select id="model_id" name="model_id" class="mt-1 block w-full bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all p-4" onchange="autoFillFromModel(this)">
+                            <option value="">Seleccione modelo...</option>
+                            @foreach($models as $m)
+                                <option value="{{ $m->id }}" {{ old('model_id', $vehicle->model_id) == $m->id ? 'selected' : '' }}>{{ $m->name }}</option>
+                            @endforeach
+                        </select>
+                        <input type="hidden" name="model" id="model" value="{{ old('model', $vehicle->model) }}" />
+                        <x-input-error class="mt-2" :messages="$errors->get('model')" />
+                    </div>
+
+                    <div>
                         <x-input-label for="make_id" :value="__('Marca')" required />
-                        <select id="make_id" name="make_id" class="mt-1 block w-full bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all p-4" onchange="loadModels(this.value); autoFillMake(this)">
+                        <select id="make_id" name="make_id" class="mt-1 block w-full bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all p-4">
                             <option value="">Seleccione marca...</option>
                             @foreach($makes as $make)
                                 <option value="{{ $make->id }}" {{ old('make_id', $vehicle->make_id) == $make->id ? 'selected' : '' }}>{{ $make->name }}</option>
@@ -43,15 +55,6 @@
                     </div>
 
                     <div>
-                        <x-input-label for="model_id" :value="__('Modelo')" required />
-                        <select id="model_id" name="model_id" class="mt-1 block w-full bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all p-4" onchange="autoFillModel(this)">
-                            <option value="">Primero seleccione marca...</option>
-                        </select>
-                        <input type="hidden" name="model" id="model" value="{{ old('model', $vehicle->model) }}" />
-                        <x-input-error class="mt-2" :messages="$errors->get('model')" />
-                    </div>
-
-                    <div>
                         <x-input-label for="year" :value="__('Año')" required />
                         <x-text-input id="year" name="year" type="number" class="mt-1 block w-full" :value="old('year', $vehicle->year)" required placeholder="2022" />
                         <x-input-error class="mt-2" :messages="$errors->get('year')" />
@@ -59,13 +62,29 @@
 
                     <div>
                         <x-input-label for="color" :value="__('Color')" />
-                        <x-text-input id="color" name="color" type="text" class="mt-1 block w-full" :value="old('color', $vehicle->color)" placeholder="Blanco" />
+                        <select id="color" name="color" class="mt-1 block w-full bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all p-4">
+                            <option value="">Seleccione color...</option>
+                            <option value="Blanco" {{ old('color', $vehicle->color) == 'Blanco' ? 'selected' : '' }}>Blanco</option>
+                            <option value="Negro" {{ old('color', $vehicle->color) == 'Negro' ? 'selected' : '' }}>Negro</option>
+                            <option value="Plateado" {{ old('color', $vehicle->color) == 'Plateado' ? 'selected' : '' }}>Plateado</option>
+                            <option value="Gris" {{ old('color', $vehicle->color) == 'Gris' ? 'selected' : '' }}>Gris</option>
+                            <option value="Rojo" {{ old('color', $vehicle->color) == 'Rojo' ? 'selected' : '' }}>Rojo</option>
+                            <option value="Azul" {{ old('color', $vehicle->color) == 'Azul' ? 'selected' : '' }}>Azul</option>
+                            <option value="Verde" {{ old('color', $vehicle->color) == 'Verde' ? 'selected' : '' }}>Verde</option>
+                            <option value="Beige" {{ old('color', $vehicle->color) == 'Beige' ? 'selected' : '' }}>Beige</option>
+                            <option value="Marrón" {{ old('color', $vehicle->color) == 'Marrón' ? 'selected' : '' }}>Marrón</option>
+                            <option value="Dorado" {{ old('color', $vehicle->color) == 'Dorado' ? 'selected' : '' }}>Dorado</option>
+                            <option value="Naranja" {{ old('color', $vehicle->color) == 'Naranja' ? 'selected' : '' }}>Naranja</option>
+                            <option value="Amarillo" {{ old('color', $vehicle->color) == 'Amarillo' ? 'selected' : '' }}>Amarillo</option>
+                            <option value="Vino" {{ old('color', $vehicle->color) == 'Vino' ? 'selected' : '' }}>Vino</option>
+                            <option value="Celeste" {{ old('color', $vehicle->color) == 'Celeste' ? 'selected' : '' }}>Celeste</option>
+                        </select>
                         <x-input-error class="mt-2" :messages="$errors->get('color')" />
                     </div>
 
                     <div>
                         <x-input-label for="license_plate" :value="__('Placa')" required />
-                        <x-text-input id="license_plate" name="license_plate" type="text" class="mt-1 block w-full uppercase" :value="old('license_plate', $vehicle->license_plate)" required placeholder="ABC-123" style="text-transform: uppercase;" />
+                        <x-text-input id="license_plate" name="license_plate" type="text" class="mt-1 block w-full" :value="old('license_plate', $vehicle->license_plate)" required placeholder="1234567" maxlength="7" oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
                         <x-input-error class="mt-2" :messages="$errors->get('license_plate')" />
                     </div>
 
@@ -165,35 +184,27 @@
     </div>
 
     <script>
-        const makesData = @json($makes);
+        const modelsData = @json($models);
 
-        function loadModels(makeId) {
-            const modelSelect = document.getElementById('model_id');
-            modelSelect.innerHTML = '<option value="">Seleccione modelo...</option>';
-            modelSelect.disabled = true;
+        function autoFillFromModel(select) {
+            const modelId = select.value;
+            const makeSelect = document.getElementById('make_id');
+            const makeHidden = document.getElementById('make');
+            const modelHidden = document.getElementById('model');
 
-            if (!makeId) return;
-
-            const make = makesData.find(m => m.id == makeId);
-            if (make && make.models.length > 0) {
-                make.models.forEach(model => {
-                    const opt = document.createElement('option');
-                    opt.value = model.id;
-                    opt.textContent = model.name;
-                    modelSelect.appendChild(opt);
-                });
-                modelSelect.disabled = false;
+            if (!modelId) {
+                makeSelect.value = '';
+                makeHidden.value = '';
+                modelHidden.value = '';
+                return;
             }
-        }
 
-        function autoFillMake(select) {
-            const selected = select.options[select.selectedIndex];
-            document.getElementById('make').value = selected ? selected.text : '';
-        }
-
-        function autoFillModel(select) {
-            const selected = select.options[select.selectedIndex];
-            document.getElementById('model').value = selected ? selected.text : '';
+            const model = modelsData.find(m => m.id == modelId);
+            if (model) {
+                makeSelect.value = model.vehicle_make_id;
+                makeHidden.value = model.make.name;
+                modelHidden.value = model.name;
+            }
         }
 
         function validateVin(input) {
@@ -202,21 +213,11 @@
 
         // Restore old selected values on page load
         document.addEventListener('DOMContentLoaded', function() {
-            const oldMakeId = '{{ old('make_id', $vehicle->make_id) }}';
             const oldModelId = '{{ old('model_id', $vehicle->model_id) }}';
-            if (oldMakeId) {
-                document.getElementById('make_id').value = oldMakeId;
-                loadModels(oldMakeId);
-                if (oldModelId) {
-                    setTimeout(() => {
-                        document.getElementById('model_id').value = oldModelId;
-                    }, 100);
-                }
+            if (oldModelId) {
+                document.getElementById('model_id').value = oldModelId;
+                autoFillFromModel(document.getElementById('model_id'));
             }
-            var autoFillMakeSelect = document.getElementById('make_id');
-            if (autoFillMakeSelect) autoFillMake(autoFillMakeSelect);
-            var autoFillModelSelect = document.getElementById('model_id');
-            if (autoFillModelSelect) autoFillModel(autoFillModelSelect);
         });
 
         function previewEditPhotos(input) {

@@ -29,8 +29,20 @@
                     </div>
 
                     <div>
+                        <x-input-label for="model_id" :value="__('Modelo')" required />
+                        <select id="model_id" name="model_id" class="mt-1 block w-full bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all p-4" onchange="autoFillFromModel(this)">
+                            <option value="">Seleccione modelo...</option>
+                            @foreach($models as $m)
+                                <option value="{{ $m->id }}" {{ old('model_id') == $m->id ? 'selected' : '' }}>{{ $m->name }}</option>
+                            @endforeach
+                        </select>
+                        <input type="hidden" name="model" id="model" value="{{ old('model') }}" />
+                        <x-input-error class="mt-2" :messages="$errors->get('model')" />
+                    </div>
+
+                    <div>
                         <x-input-label for="make_id" :value="__('Marca')" required />
-                        <select id="make_id" name="make_id" class="mt-1 block w-full bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all p-4" onchange="loadModels(this.value); autoFillMake(this)">
+                        <select id="make_id" name="make_id" class="mt-1 block w-full bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all p-4">
                             <option value="">Seleccione marca...</option>
                             @foreach($makes as $make)
                                 <option value="{{ $make->id }}" {{ old('make_id') == $make->id ? 'selected' : '' }}>{{ $make->name }}</option>
@@ -41,15 +53,6 @@
                     </div>
 
                     <div>
-                        <x-input-label for="model_id" :value="__('Modelo')" required />
-                        <select id="model_id" name="model_id" class="mt-1 block w-full bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all p-4" disabled onchange="autoFillModel(this)">
-                            <option value="">Primero seleccione marca...</option>
-                        </select>
-                        <input type="hidden" name="model" id="model" value="{{ old('model') }}" />
-                        <x-input-error class="mt-2" :messages="$errors->get('model')" />
-                    </div>
-
-                    <div>
                         <x-input-label for="year" :value="__('Año')" required />
                         <x-text-input id="year" name="year" type="number" class="mt-1 block w-full" required placeholder="2022" />
                         <x-input-error class="mt-2" :messages="$errors->get('year')" />
@@ -57,13 +60,29 @@
 
                     <div>
                         <x-input-label for="color" :value="__('Color')" />
-                        <x-text-input id="color" name="color" type="text" class="mt-1 block w-full" placeholder="Blanco" />
+                        <select id="color" name="color" class="mt-1 block w-full bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all p-4">
+                            <option value="">Seleccione color...</option>
+                            <option value="Blanco" {{ old('color') == 'Blanco' ? 'selected' : '' }}>Blanco</option>
+                            <option value="Negro" {{ old('color') == 'Negro' ? 'selected' : '' }}>Negro</option>
+                            <option value="Plateado" {{ old('color') == 'Plateado' ? 'selected' : '' }}>Plateado</option>
+                            <option value="Gris" {{ old('color') == 'Gris' ? 'selected' : '' }}>Gris</option>
+                            <option value="Rojo" {{ old('color') == 'Rojo' ? 'selected' : '' }}>Rojo</option>
+                            <option value="Azul" {{ old('color') == 'Azul' ? 'selected' : '' }}>Azul</option>
+                            <option value="Verde" {{ old('color') == 'Verde' ? 'selected' : '' }}>Verde</option>
+                            <option value="Beige" {{ old('color') == 'Beige' ? 'selected' : '' }}>Beige</option>
+                            <option value="Marrón" {{ old('color') == 'Marrón' ? 'selected' : '' }}>Marrón</option>
+                            <option value="Dorado" {{ old('color') == 'Dorado' ? 'selected' : '' }}>Dorado</option>
+                            <option value="Naranja" {{ old('color') == 'Naranja' ? 'selected' : '' }}>Naranja</option>
+                            <option value="Amarillo" {{ old('color') == 'Amarillo' ? 'selected' : '' }}>Amarillo</option>
+                            <option value="Vino" {{ old('color') == 'Vino' ? 'selected' : '' }}>Vino</option>
+                            <option value="Celeste" {{ old('color') == 'Celeste' ? 'selected' : '' }}>Celeste</option>
+                        </select>
                         <x-input-error class="mt-2" :messages="$errors->get('color')" />
                     </div>
 
                     <div>
                         <x-input-label for="license_plate" :value="__('Placa')" required />
-                        <x-text-input id="license_plate" name="license_plate" type="text" class="mt-1 block w-full uppercase" required placeholder="ABC-123" style="text-transform: uppercase;" />
+                        <x-text-input id="license_plate" name="license_plate" type="text" class="mt-1 block w-full" required placeholder="1234567" maxlength="7" oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
                         <x-input-error class="mt-2" :messages="$errors->get('license_plate')" />
                     </div>
 
@@ -135,35 +154,27 @@
     </div>
 
     <script>
-        const makesData = @json($makes);
+        const modelsData = @json($models);
 
-        function loadModels(makeId) {
-            const modelSelect = document.getElementById('model_id');
-            modelSelect.innerHTML = '<option value="">Seleccione modelo...</option>';
-            modelSelect.disabled = true;
+        function autoFillFromModel(select) {
+            const modelId = select.value;
+            const makeSelect = document.getElementById('make_id');
+            const makeHidden = document.getElementById('make');
+            const modelHidden = document.getElementById('model');
 
-            if (!makeId) return;
-
-            const make = makesData.find(m => m.id == makeId);
-            if (make && make.models.length > 0) {
-                make.models.forEach(model => {
-                    const opt = document.createElement('option');
-                    opt.value = model.id;
-                    opt.textContent = model.name;
-                    modelSelect.appendChild(opt);
-                });
-                modelSelect.disabled = false;
+            if (!modelId) {
+                makeSelect.value = '';
+                makeHidden.value = '';
+                modelHidden.value = '';
+                return;
             }
-        }
 
-        function autoFillMake(select) {
-            const selected = select.options[select.selectedIndex];
-            document.getElementById('make').value = selected ? selected.text : '';
-        }
-
-        function autoFillModel(select) {
-            const selected = select.options[select.selectedIndex];
-            document.getElementById('model').value = selected ? selected.text : '';
+            const model = modelsData.find(m => m.id == modelId);
+            if (model) {
+                makeSelect.value = model.vehicle_make_id;
+                makeHidden.value = model.make.name;
+                modelHidden.value = model.name;
+            }
         }
 
         function validateVin(input) {
@@ -172,16 +183,10 @@
 
         // Restore old selected values on page load
         document.addEventListener('DOMContentLoaded', function() {
-            const oldMakeId = '{{ old('make_id') }}';
             const oldModelId = '{{ old('model_id') }}';
-            if (oldMakeId) {
-                document.getElementById('make_id').value = oldMakeId;
-                loadModels(oldMakeId);
-                if (oldModelId) {
-                    setTimeout(() => {
-                        document.getElementById('model_id').value = oldModelId;
-                    }, 100);
-                }
+            if (oldModelId) {
+                document.getElementById('model_id').value = oldModelId;
+                autoFillFromModel(document.getElementById('model_id'));
             }
         });
 

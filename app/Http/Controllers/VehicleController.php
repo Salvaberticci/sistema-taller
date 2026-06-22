@@ -22,9 +22,10 @@ class VehicleController extends Controller
     public function create()
     {
         $customers = Customer::orderBy('name')->get();
-        $makes = VehicleMake::with('models')->orderBy('name')->get();
+        $makes = VehicleMake::orderBy('name')->get();
+        $models = VehicleModel::with('make')->orderBy('name')->get();
         $mechanics = User::where('role', 'mecanico')->orWhere('role', 'mechanic')->orderBy('name')->get();
-        return view('modules.vehicles.create', compact('customers', 'makes', 'mechanics'));
+        return view('modules.vehicles.create', compact('customers', 'makes', 'models', 'mechanics'));
     }
 
     public function store(Request $request)
@@ -36,7 +37,7 @@ class VehicleController extends Controller
             'make' => 'required|string|max:100',
             'model' => 'required|string|max:100',
             'year' => 'required|integer|min:1900|max:'.(date('Y')+1),
-            'license_plate' => 'required|string|max:20|regex:/^[A-Z0-9-]+$/|unique:vehicles',
+            'license_plate' => 'required|digits:7|unique:vehicles',
             'color' => 'nullable|string|max:50',
             'vin' => ['required', 'size:17', 'regex:/^[A-HJ-NPR-Z0-9]+$/u', 'unique:vehicles'],
             'mileage' => 'nullable|integer|min:0',
@@ -53,7 +54,7 @@ class VehicleController extends Controller
             'year.min' => 'El año debe ser como mínimo 1900.',
             'year.max' => 'El año no puede ser mayor a ' . (date('Y') + 1) . '.',
             'license_plate.required' => 'La placa del vehículo es obligatoria.',
-            'license_plate.regex' => 'Formato de placa inválido.',
+            'license_plate.digits' => 'La placa debe tener exactamente 7 dígitos numéricos.',
             'license_plate.unique' => 'Esta placa ya ha sido registrada.',
             'vin.required' => 'El VIN es obligatorio.',
             'vin.size' => 'El VIN debe tener exactamente 17 caracteres.',
@@ -90,9 +91,10 @@ class VehicleController extends Controller
     {
         $vehicle->load('photos');
         $customers = Customer::orderBy('name')->get();
-        $makes = VehicleMake::with('models')->orderBy('name')->get();
+        $makes = VehicleMake::orderBy('name')->get();
+        $models = VehicleModel::with('make')->orderBy('name')->get();
         $mechanics = User::where('role', 'mecanico')->orWhere('role', 'mechanic')->orderBy('name')->get();
-        return view('modules.vehicles.edit', compact('vehicle', 'customers', 'makes', 'mechanics'));
+        return view('modules.vehicles.edit', compact('vehicle', 'customers', 'makes', 'models', 'mechanics'));
     }
 
     public function update(Request $request, Vehicle $vehicle)
@@ -104,7 +106,7 @@ class VehicleController extends Controller
             'make' => 'required|string|max:100',
             'model' => 'required|string|max:100',
             'year' => 'required|integer|min:1900|max:'.(date('Y')+1),
-            'license_plate' => 'required|string|max:20|regex:/^[A-Z0-9-]+$/|unique:vehicles,license_plate,'.$vehicle->id,
+            'license_plate' => 'required|digits:7|unique:vehicles,license_plate,'.$vehicle->id,
             'color' => 'nullable|string|max:50',
             'vin' => ['required', 'size:17', 'regex:/^[A-HJ-NPR-Z0-9]+$/u', 'unique:vehicles,vin,'.$vehicle->id],
             'mileage' => 'nullable|integer|min:0',
@@ -121,7 +123,7 @@ class VehicleController extends Controller
             'year.min' => 'El año debe ser como mínimo 1900.',
             'year.max' => 'El año no puede ser mayor a ' . (date('Y') + 1) . '.',
             'license_plate.required' => 'La placa del vehículo es obligatoria.',
-            'license_plate.regex' => 'Formato de placa inválido.',
+            'license_plate.digits' => 'La placa debe tener exactamente 7 dígitos numéricos.',
             'license_plate.unique' => 'Esta placa ya ha sido registrada.',
             'vin.required' => 'El VIN es obligatorio.',
             'vin.size' => 'El VIN debe tener exactamente 17 caracteres.',
