@@ -82,7 +82,7 @@
 
                     <div>
                         <x-input-label for="license_plate" :value="__('Placa')" required />
-                        <x-text-input id="license_plate" name="license_plate" type="text" class="mt-1 block w-full" required placeholder="1234567" maxlength="7" oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
+                        <x-text-input id="license_plate" name="license_plate" type="text" class="mt-1 block w-full uppercase" required placeholder="ABC-123 o ABC1234" maxlength="8" style="text-transform: uppercase;" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9-]/g,'')" />
                         <x-input-error class="mt-2" :messages="$errors->get('license_plate')" />
                     </div>
 
