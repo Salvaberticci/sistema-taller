@@ -44,7 +44,7 @@
 
                     <div>
                         <x-input-label for="make_id" :value="__('Marca')" required />
-                        <select id="make_id" name="make_id" class="mt-1 block w-full bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all p-4">
+                        <select id="make_id" name="make_id" class="mt-1 block w-full bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all p-4" onchange="filterModelsByMake()">
                             <option value="">Seleccione marca...</option>
                             @foreach($makes as $make)
                                 <option value="{{ $make->id }}" {{ old('make_id', $vehicle->make_id) == $make->id ? 'selected' : '' }}>{{ $make->name }}</option>
@@ -186,6 +186,25 @@
     <script>
         const modelsData = @json($models);
 
+        function filterModelsByMake() {
+            const makeId = document.getElementById('make_id').value;
+            const modelSelect = document.getElementById('model_id');
+            const options = modelSelect.querySelectorAll('option');
+
+            options.forEach(opt => {
+                if (!opt.value) return;
+                const model = modelsData.find(m => m.id == opt.value);
+                if (model) {
+                    opt.style.display = makeId === '' || model.vehicle_make_id == makeId ? '' : 'none';
+                }
+            });
+
+            if (modelSelect.value && !modelSelect.querySelector('option[value="' + modelSelect.value + '"]:not([style*="none"])')) {
+                modelSelect.value = '';
+                document.getElementById('model').value = '';
+            }
+        }
+
         function autoFillFromModel(select) {
             const modelId = select.value;
             const makeSelect = document.getElementById('make_id');
@@ -213,6 +232,11 @@
 
         // Restore old selected values on page load
         document.addEventListener('DOMContentLoaded', function() {
+            const oldMakeId = '{{ old('make_id', $vehicle->make_id) }}';
+            if (oldMakeId) {
+                document.getElementById('make_id').value = oldMakeId;
+                filterModelsByMake();
+            }
             const oldModelId = '{{ old('model_id', $vehicle->model_id) }}';
             if (oldModelId) {
                 document.getElementById('model_id').value = oldModelId;
