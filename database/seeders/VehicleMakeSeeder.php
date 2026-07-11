@@ -34,6 +34,9 @@ class VehicleMakeSeeder extends Seeder
             'Bera (Motos)' => ['Scooter 150', 'BR 200', 'Motorcycle 250'],
             'Chery' => ['Tiggo 2', 'Tiggo 3', 'Tiggo 5', 'Tiggo 7', 'Tiggo 8', 'Arrizo 5', 'Arrizo 6', 'QQ', 'eQ1', 'iCar'],
             'Mopad' => ['Magnum 125', 'Magnum 150', 'City 125', 'City 150', 'Sport 200', 'Cross 250'],
+            'Geely' => ['Emgrand', 'Azkarra', 'Coolray', 'Tugella', 'Okavango', 'Geometry C', 'Xingyue', 'Binrui', 'Boyue', 'Monjaro'],
+            'Dongfeng' => ['AX4', 'AX7', 'S30', 'H30', '580', 'Glory 580', 'Fengon 500', 'Fengon 580', 'Fengon S560', 'Fengshun'],
+            'Centauro' => ['King 150', 'King 200', 'Raptor 150', 'Raptor 250', 'Thunder 200', 'Titan 150', 'Titan 200', 'GT 150'],
         ];
 
         foreach ($makes as $makeName => $models) {
