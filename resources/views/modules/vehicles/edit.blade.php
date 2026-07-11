@@ -35,7 +35,7 @@
                         <select id="model_id" name="model_id" class="mt-1 block w-full bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all p-4" onchange="autoFillFromModel(this)">
                             <option value="">Seleccione modelo...</option>
                             @foreach($models as $m)
-                                <option value="{{ $m->id }}" {{ old('model_id', $vehicle->model_id) == $m->id ? 'selected' : '' }}>{{ $m->name }}</option>
+                                <option value="{{ $m->id }}" {{ old('model_id', $vehicle->model_id) == $m->id ? 'selected' : '' }}>{{ $m->make->name ?? '' }} - {{ $m->name }}</option>
                             @endforeach
                         </select>
                         <input type="hidden" name="model" id="model" value="{{ old('model', $vehicle->model) }}" />
