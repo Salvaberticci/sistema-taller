@@ -41,9 +41,7 @@
                                 <a href="{{ url('/dashboard') }}" class="text-sm font-bold hover:text-blue-400 transition-colors">Panel de Control</a>
                             @else
                                 <a href="{{ route('login') }}" class="text-sm font-bold hover:text-blue-400 transition-colors">Iniciar Sesión</a>
-                                @if (Route::has('register'))
-                                    <a href="{{ route('register') }}" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-full text-sm font-bold transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/25">Comenzar Gratis</a>
-                                @endif
+                                <a href="{{ route('login') }}" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-full text-sm font-bold transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/25">Iniciar Sesión</a>
                             @endauth
                         @endif
                     </div>
@@ -64,8 +62,8 @@
                     La plataforma inteligente de Inversiones Dios es Amor 31 C. A. para automatizar tu flujo de trabajo y maximizar la rentabilidad.
                 </p>
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <a href="{{ route('register') }}" class="w-full sm:w-auto px-10 py-5 bg-white text-black rounded-2xl font-black text-lg transition-all hover:scale-105 hover:bg-blue-50 active:scale-95 shadow-2xl">
-                        Registrar mi Taller
+                    <a href="{{ route('login') }}" class="w-full sm:w-auto px-10 py-5 bg-white text-black rounded-2xl font-black text-lg transition-all hover:scale-105 hover:bg-blue-50 active:scale-95 shadow-2xl">
+                        Iniciar Sesión
                     </a>
                     <a href="#features" class="w-full sm:w-auto px-10 py-5 glass rounded-2xl font-bold text-lg transition-all hover:bg-white/5 active:scale-95">
                         Ver Módulos

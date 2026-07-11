@@ -33,6 +33,15 @@ class LoginRequest extends FormRequest
         ];
     }
 
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            if (! session('captcha_verified')) {
+                $validator->errors()->add('captcha', 'Debes verificar que no eres un robot.');
+            }
+        });
+    }
+
     /**
      * Attempt to authenticate the request's credentials.
      *

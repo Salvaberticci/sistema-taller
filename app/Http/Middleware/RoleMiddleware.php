@@ -15,7 +15,13 @@ class RoleMiddleware
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if (!$request->user() || !in_array($request->user()->role, $roles)) {
+        $userRole = match ($request->user()->role) {
+            'mecanico' => 'mechanic',
+            'recepcionista' => 'receptionist',
+            default => $request->user()->role,
+        };
+
+        if (!$request->user() || !in_array($userRole, $roles)) {
             abort(403, 'No tienes permiso para acceder a esta sección.');
         }
 

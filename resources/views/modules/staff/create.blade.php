@@ -32,9 +32,11 @@
                 <div>
                     <x-input-label for="role" :value="__('Rol en el Sistema')" />
                     <select id="role" name="role" class="mt-1 block w-full bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all p-3" required>
-                        <option value="admin">Administrador (Acceso total)</option>
-                        <option value="mecanico" selected>Mecánico (Gestión operativa)</option>
-                        <option value="recepcionista">Recepcionista (Clientes y Citas)</option>
+                        @if ($isAdmin)
+                            <option value="admin">Administrador (Acceso total)</option>
+                        @endif
+                        <option value="mechanic" selected>Mecánico (Gestión operativa)</option>
+                        <option value="receptionist">Recepcionista (Clientes y Citas)</option>
                     </select>
                     <x-input-error class="mt-2" :messages="$errors->get('role')" />
                 </div>

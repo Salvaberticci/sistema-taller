@@ -54,7 +54,7 @@
             'activePattern' => 'staff.*',
             'label' => 'Personal',
             'icon' => 'user-group',
-            'roles' => ['admin'],
+            'roles' => ['admin', 'receptionist'],
         ],
         [
             'route' => 'ai.chat',
@@ -66,8 +66,9 @@
         ],
     ];
 
-    $navItems = array_filter($allNavItems, function ($item) {
-        return in_array(Auth::user()->role ?? 'receptionist', $item['roles']);
+    $userRole = match(Auth::user()->role) { 'mecanico' => 'mechanic', 'recepcionista' => 'receptionist', default => Auth::user()->role ?? 'receptionist' };
+    $navItems = array_filter($allNavItems, function ($item) use ($userRole) {
+        return in_array($userRole, $item['roles']);
     });
 @endphp
 
@@ -153,7 +154,7 @@
                 </div>
                 <div class="min-w-0 flex-1">
                     <p class="text-xs font-bold text-white truncate">{{ Auth::user()->name }}</p>
-                    <p class="text-[10px] text-blue-500 font-bold uppercase tracking-wider">{{ Auth::user()->role }}</p>
+                    <p class="text-[10px] text-blue-500 font-bold uppercase tracking-wider">{{ ['admin' => 'Admin', 'mechanic' => 'Mecánico', 'receptionist' => 'Recepcionista', 'mecanico' => 'Mecánico', 'recepcionista' => 'Recepcionista'][Auth::user()->role] ?? Auth::user()->role }}</p>
                 </div>
             </div>
             
@@ -276,7 +277,7 @@
                     </div>
                     <div class="min-w-0 flex-1">
                         <p class="text-xs font-bold text-white truncate">{{ Auth::user()->name }}</p>
-                        <p class="text-[10px] text-blue-500 font-bold uppercase tracking-wider">{{ Auth::user()->role }}</p>
+                    <p class="text-[10px] text-blue-500 font-bold uppercase tracking-wider">{{ ['admin' => 'Admin', 'mechanic' => 'Mecánico', 'receptionist' => 'Recepcionista', 'mecanico' => 'Mecánico', 'recepcionista' => 'Recepcionista'][Auth::user()->role] ?? Auth::user()->role }}</p>
                     </div>
                 </div>
                 

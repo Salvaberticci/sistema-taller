@@ -108,9 +108,6 @@ Route::middleware('auth')->group(function () {
 
     // ─── Rutas exclusivas del Administrador ───
     Route::middleware('role:admin')->group(function () {
-        // Personal
-        Route::resource('/personal', \App\Http\Controllers\StaffController::class)->names('staff')->parameters(['personal' => 'staff']);
-
         // Facturación y Pagos
         Route::resource('/facturacion', \App\Http\Controllers\InvoiceController::class)->names('invoices')->parameters(['facturacion' => 'invoice']);
         Route::post('/facturacion/{invoice}/pagar', [\App\Http\Controllers\InvoiceController::class, 'addPayment'])->name('invoices.payment');
@@ -139,6 +136,9 @@ Route::middleware('auth')->group(function () {
 
     // ─── Rutas compartidas: Administrador y Recepcionista ───
     Route::middleware('role:admin,receptionist')->group(function () {
+        // Personal (solo admin puede crear/editar administradores)
+        Route::resource('/personal', \App\Http\Controllers\StaffController::class)->names('staff')->parameters(['personal' => 'staff']);
+
         Route::resource('/clientes', \App\Http\Controllers\CustomerController::class)->names('customers')->parameters(['clientes' => 'customer']);
         Route::resource('/vehiculos', \App\Http\Controllers\VehicleController::class)->names('vehicles')->parameters(['vehiculos' => 'vehicle']);
         Route::post('/vehiculos/{vehicle}/fotos', [\App\Http\Controllers\VehicleController::class, 'storePhotos'])->name('vehicles.photos.store');
@@ -171,5 +171,20 @@ Route::middleware('auth')->group(function () {
         Route::patch('/ordenes/{order}/status', [\App\Http\Controllers\ServiceOrderController::class, 'updateStatus'])->name('orders.updateStatus');
     });
 });
+
+Route::post('/_captcha/verify', function () {
+    $input = request('captcha_indices', '');
+    $selected = $input !== '' ? explode(',', $input) : [];
+    $selected = array_map('intval', $selected);
+    sort($selected);
+
+    $correct = session('captcha_correct', []);
+    if ($selected === $correct) {
+        session(['captcha_verified' => true]);
+        return response()->json(['success' => true]);
+    }
+
+    return response()->json(['success' => false, 'message' => 'Selecciona las imágenes correctas.']);
+})->middleware('web')->name('captcha.verify');
 
 require __DIR__.'/auth.php';

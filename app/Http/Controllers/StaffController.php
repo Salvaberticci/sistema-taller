@@ -11,22 +11,29 @@ class StaffController extends Controller
 {
     public function index()
     {
-        $staff = User::latest()->get();
+        $staff = auth()->user()->role === 'admin'
+            ? User::latest()->get()
+            : User::whereIn('role', ['mechanic', 'receptionist', 'mecanico', 'recepcionista'])->latest()->get();
         return view('modules.staff.index', compact('staff'));
     }
 
     public function create()
     {
-        return view('modules.staff.create');
+        $isAdmin = auth()->user()->role === 'admin';
+        return view('modules.staff.create', compact('isAdmin'));
     }
 
     public function store(Request $request)
     {
+        $allowedRoles = auth()->user()->role === 'admin'
+            ? 'admin,mechanic,receptionist'
+            : 'mechanic,receptionist';
+
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'in:admin,mecanico,recepcionista'],
+            'role' => ['required', 'in:'.$allowedRoles],
         ]);
 
         User::create([
@@ -41,15 +48,20 @@ class StaffController extends Controller
 
     public function edit(User $staff)
     {
-        return view('modules.staff.edit', compact('staff'));
+        $isAdmin = auth()->user()->role === 'admin';
+        return view('modules.staff.edit', compact('staff', 'isAdmin'));
     }
 
     public function update(Request $request, User $staff)
     {
+        $allowedRoles = auth()->user()->role === 'admin'
+            ? 'admin,mechanic,receptionist'
+            : 'mechanic,receptionist';
+
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,'.$staff->id],
-            'role' => ['required', 'in:admin,mecanico,recepcionista'],
+            'role' => ['required', 'in:'.$allowedRoles],
         ]);
 
         $staff->update([

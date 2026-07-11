@@ -16,7 +16,73 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
-        return view('auth.login');
+        $categories = [
+            'animales' => ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🐤','🦆','🦅','🦉','🐺','🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐞','🐜','🦗','🦂','🐢','🐍','🦎','🦖','🦕','🐙','🦑','🦐','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐊'],
+            'comida' => ['🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑','🥦','🥬','🥒','🌽','🥕','🍔','🍕','🌮','🌯','🥗','🍜','🍝','🍣','🍤','🥟','🍦','🍩','🍪','🎂','🍫','🍬','🍭'],
+            'vehiculos' => ['🚗','🚕','🚙','🚌','🚎','🏎','🚓','🚑','🚒','🚐','🛻','🚚','🚛','🚜','🛵','🏍','🛺','🚲','🛴','🛹','🚀','🛸','🚁','✈️','🛩','🛰','🚂','🚃','🚄','🚢','⛵','🛶'],
+            'caritas' => ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','😉','😊','😇','🥰','😍','🤩','😘','😋','😛','🤪','😝','🤑','🤗','🤭','🤔','🤐','😏','😒','🙄','😬','🥺','😢','😭','😱','😡','🤬','🥶','🤯'],
+            'naturaleza' => ['🌸','🌺','🌻','🌹','🌷','🌿','🍀','🌵','🌴','🌲','🌳','🍄','🌾','💐','🌈','☀️','⛅','🌧','❄️','🔥','💧','🌊','⭐','🌙','☁️','⚡'],
+        ];
+
+        $categoryNames = [
+            'animales' => 'animales',
+            'comida' => 'alimentos',
+            'vehiculos' => 'vehículos',
+            'caritas' => 'caritas felices',
+            'naturaleza' => 'elementos de la naturaleza',
+        ];
+
+        $catKeys = array_keys($categories);
+        $selectedCat = $catKeys[array_rand($catKeys)];
+        $correctEmojis = $categories[$selectedCat];
+
+        $otherEmojis = [];
+        foreach ($categories as $key => $emojis) {
+            if ($key !== $selectedCat) {
+                $otherEmojis = array_merge($otherEmojis, $emojis);
+            }
+        }
+
+        $numCorrect = rand(3, 4);
+        $selectedCorrect = [];
+        $correctIndices = [];
+        $correctPool = $correctEmojis;
+        shuffle($correctPool);
+
+        $allEmojis = [];
+        $distractorPool = $otherEmojis;
+        shuffle($distractorPool);
+
+        for ($i = 0; $i < 9; $i++) {
+            if ($i < $numCorrect && !empty($correctPool)) {
+                $emoji = array_pop($correctPool);
+                $selectedCorrect[] = $emoji;
+                $correctIndices[] = $i;
+                $allEmojis[] = $emoji;
+            } else {
+                $allEmojis[] = !empty($distractorPool) ? array_pop($distractorPool) : '❓';
+            }
+        }
+
+        shuffle($allEmojis);
+
+        $correctIndices = [];
+        foreach ($allEmojis as $i => $emoji) {
+            if (in_array($emoji, $selectedCorrect)) {
+                $correctIndices[] = $i;
+            }
+        }
+
+        session([
+            'captcha_verified' => false,
+            'captcha_category' => $categoryNames[$selectedCat],
+            'captcha_correct' => $correctIndices,
+        ]);
+
+        return view('auth.login', [
+            'captchaEmojis' => $allEmojis,
+            'captchaCategory' => $categoryNames[$selectedCat],
+        ]);
     }
 
     /**

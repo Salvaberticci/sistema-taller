@@ -44,8 +44,15 @@
                         @php
                             $roleColors = [
                                 'admin' => 'bg-red-600 shadow-red-500/20',
-                                'mecanico' => 'bg-blue-600 shadow-blue-500/20',
-                                'recepcionista' => 'bg-purple-600 shadow-purple-500/20',
+                                'mechanic' => 'bg-blue-600 shadow-blue-500/20',
+                                'receptionist' => 'bg-purple-600 shadow-purple-500/20',
+                            ];
+                            $roleLabels = [
+                                'admin' => 'Administrador',
+                                'mechanic' => 'Mecánico',
+                                'receptionist' => 'Recepcionista',
+                                'mecanico' => 'Mecánico',
+                                'recepcionista' => 'Recepcionista',
                             ];
                             $initials = collect(explode(' ', $member->name))->map(fn($n) => substr($n, 0, 1))->take(2)->join('');
                         @endphp
@@ -57,8 +64,8 @@
                     
                     <h3 class="text-xl font-bold text-white mb-1">{{ $member->name }}</h3>
                     <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{{ $member->email }}</p>
-                    <p class="text-[10px] font-black {{ $member->role == 'admin' ? 'text-red-400' : ($member->role == 'mecanico' ? 'text-blue-400' : 'text-purple-400') }} uppercase tracking-widest mb-4">
-                        {{ $member->role }}
+                    <p class="text-[10px] font-black {{ $member->role == 'admin' ? 'text-red-400' : ($member->role == 'mechanic' ? 'text-blue-400' : 'text-purple-400') }} uppercase tracking-widest mb-4">
+                        {{ $roleLabels[$member->role] ?? $member->role }}
                     </p>
                     
                     <div class="w-full flex gap-3 mt-6 pt-6 border-t border-slate-700/50">
