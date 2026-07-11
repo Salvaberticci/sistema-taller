@@ -29,27 +29,33 @@
                     </div>
 
                     <div>
-                        <x-input-label for="model_id" :value="__('Modelo')" required />
-                        <select id="model_id" name="model_id" class="mt-1 block w-full bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all p-4" onchange="autoFillFromModel(this)">
-                            <option value="">Seleccione modelo...</option>
-                            @foreach($models as $m)
-                                <option value="{{ $m->id }}" {{ old('model_id') == $m->id ? 'selected' : '' }}>{{ $m->make->name ?? '' }} - {{ $m->name }}</option>
-                            @endforeach
-                        </select>
-                        <input type="hidden" name="model" id="model" value="{{ old('model') }}" />
-                        <x-input-error class="mt-2" :messages="$errors->get('model')" />
+                        <x-input-label for="make_id" :value="__('Marca')" required />
+                        <div class="flex gap-2 mt-1">
+                            <select id="make_id" name="make_id" class="flex-1 block bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all p-4" onchange="filterModelsByMake()">
+                                <option value="">Seleccione marca...</option>
+                                @foreach($makes as $make)
+                                    <option value="{{ $make->id }}" {{ old('make_id') == $make->id ? 'selected' : '' }}>{{ $make->name }}</option>
+                                @endforeach
+                            </select>
+                            <button type="button" onclick="openQuickAddMake()" class="px-4 bg-slate-800 hover:bg-blue-600 border border-slate-700 hover:border-blue-500 rounded-xl text-slate-400 hover:text-white transition-all shrink-0 font-bold text-lg">+</button>
+                        </div>
+                        <input type="hidden" name="make" id="make" value="{{ old('make') }}" />
+                        <x-input-error class="mt-2" :messages="$errors->get('make')" />
                     </div>
 
                     <div>
-                        <x-input-label for="make_id" :value="__('Marca')" required />
-                        <select id="make_id" name="make_id" class="mt-1 block w-full bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all p-4" onchange="filterModelsByMake()">
-                            <option value="">Seleccione marca...</option>
-                            @foreach($makes as $make)
-                                <option value="{{ $make->id }}" {{ old('make_id') == $make->id ? 'selected' : '' }}>{{ $make->name }}</option>
-                            @endforeach
-                        </select>
-                        <input type="hidden" name="make" id="make" value="{{ old('make') }}" />
-                        <x-input-error class="mt-2" :messages="$errors->get('make')" />
+                        <x-input-label for="model_id" :value="__('Modelo')" required />
+                        <div class="flex gap-2 mt-1">
+                            <select id="model_id" name="model_id" class="flex-1 block bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all p-4" onchange="autoFillFromModel(this)">
+                                <option value="">Seleccione modelo...</option>
+                                @foreach($models as $m)
+                                    <option value="{{ $m->id }}" {{ old('model_id') == $m->id ? 'selected' : '' }}>{{ $m->make->name ?? '' }} - {{ $m->name }}</option>
+                                @endforeach
+                            </select>
+                            <button type="button" onclick="openQuickAddModel()" class="px-4 bg-slate-800 hover:bg-blue-600 border border-slate-700 hover:border-blue-500 rounded-xl text-slate-400 hover:text-white transition-all shrink-0 font-bold text-lg">+</button>
+                        </div>
+                        <input type="hidden" name="model" id="model" value="{{ old('model') }}" />
+                        <x-input-error class="mt-2" :messages="$errors->get('model')" />
                     </div>
 
                     <div>
@@ -258,5 +264,124 @@
                 previewCreatePhotos(createPhotoInput);
             });
         }
+    </script>
+
+    <!-- Modal Agregar Marca -->
+    <div id="quick-make-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center" onclick="closeQuickModal('quick-make-modal', event)">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-sm mx-4 shadow-2xl" onclick="event.stopPropagation()">
+            <h3 class="text-lg font-bold text-white mb-4">Agregar Marca</h3>
+            <input id="quick-make-input" type="text" placeholder="Nombre de la marca" class="w-full px-4 py-3 bg-slate-800 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4">
+            <p id="quick-make-error" class="text-red-400 text-xs mb-3 hidden"></p>
+            <div class="flex gap-3 justify-end">
+                <button onclick="closeQuickModal('quick-make-modal', null)" class="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-xl font-bold text-sm transition-all">Cancelar</button>
+                <button onclick="submitQuickAddMake()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-all">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Agregar Modelo -->
+    <div id="quick-model-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center" onclick="closeQuickModal('quick-model-modal', event)">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-sm mx-4 shadow-2xl" onclick="event.stopPropagation()">
+            <h3 class="text-lg font-bold text-white mb-4">Agregar Modelo</h3>
+            <input id="quick-model-input" type="text" placeholder="Nombre del modelo" class="w-full px-4 py-3 bg-slate-800 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4">
+            <p id="quick-model-error" class="text-red-400 text-xs mb-3 hidden"></p>
+            <div class="flex gap-3 justify-end">
+                <button onclick="closeQuickModal('quick-model-modal', null)" class="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-xl font-bold text-sm transition-all">Cancelar</button>
+                <button onclick="submitQuickAddModel()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-all">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openQuickAddMake() {
+            document.getElementById('quick-make-input').value = '';
+            document.getElementById('quick-make-error').classList.add('hidden');
+            document.getElementById('quick-make-modal').classList.remove('hidden');
+            document.getElementById('quick-make-modal').classList.add('flex');
+            setTimeout(() => document.getElementById('quick-make-input').focus(), 100);
+        }
+
+        function openQuickAddModel() {
+            const makeId = document.getElementById('make_id').value;
+            if (!makeId) {
+                alert('Primero selecciona o agrega una marca.');
+                return;
+            }
+            document.getElementById('quick-model-input').value = '';
+            document.getElementById('quick-model-error').classList.add('hidden');
+            document.getElementById('quick-model-modal').classList.remove('hidden');
+            document.getElementById('quick-model-modal').classList.add('flex');
+            setTimeout(() => document.getElementById('quick-model-input').focus(), 100);
+        }
+
+        function closeQuickModal(id, e) {
+            if (e === null || (e && e.target === e.currentTarget)) {
+                document.getElementById(id).classList.add('hidden');
+                document.getElementById(id).classList.remove('flex');
+            }
+        }
+
+        function submitQuickAddMake() {
+            const input = document.getElementById('quick-make-input');
+            const error = document.getElementById('quick-make-error');
+            const name = input.value.trim();
+            if (!name) { error.textContent = 'Escribe el nombre de la marca.'; error.classList.remove('hidden'); return; }
+            error.classList.add('hidden');
+
+            fetch('{{ route("quick-add.make") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: JSON.stringify({ name }),
+            })
+            .then(r => r.json().then(d => ({ status: r.status, data: d })))
+            .then(({ status, data }) => {
+                if (!data.success) { error.textContent = data.message; error.classList.remove('hidden'); return; }
+                const select = document.getElementById('make_id');
+                const opt = document.createElement('option');
+                opt.value = data.id; opt.textContent = data.name;
+                select.appendChild(opt);
+                select.value = data.id;
+                filterModelsByMake();
+                closeQuickModal('quick-make-modal', null);
+            })
+            .catch(() => { error.textContent = 'Error al guardar. Intenta de nuevo.'; error.classList.remove('hidden'); });
+        }
+
+        function submitQuickAddModel() {
+            const input = document.getElementById('quick-model-input');
+            const error = document.getElementById('quick-model-error');
+            const name = input.value.trim();
+            const makeId = document.getElementById('make_id').value;
+            if (!name) { error.textContent = 'Escribe el nombre del modelo.'; error.classList.remove('hidden'); return; }
+            error.classList.add('hidden');
+
+            fetch('{{ route("quick-add.model") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: JSON.stringify({ name, make_id: makeId }),
+            })
+            .then(r => r.json().then(d => ({ status: r.status, data: d })))
+            .then(({ status, data }) => {
+                if (!data.success) { error.textContent = data.message; error.classList.remove('hidden'); return; }
+                const select = document.getElementById('model_id');
+                const opt = document.createElement('option');
+                opt.value = data.id; opt.textContent = data.make_name + ' - ' + data.name;
+                select.appendChild(opt);
+                select.value = data.id;
+                autoFillFromModel(select);
+                closeQuickModal('quick-model-modal', null);
+            })
+            .catch(() => { error.textContent = 'Error al guardar. Intenta de nuevo.'; error.classList.remove('hidden'); });
+        }
+
+        // Enter key support on modals
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('quick-make-input').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault(); submitQuickAddMake(); }
+            });
+            document.getElementById('quick-model-input').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault(); submitQuickAddModel(); }
+            });
+        });
     </script>
 </x-app-layout>

@@ -187,4 +187,30 @@ Route::post('/_captcha/verify', function () {
     return response()->json(['success' => false, 'message' => 'Selecciona las imágenes correctas.']);
 })->middleware('web')->name('captcha.verify');
 
+Route::post('/_quick-add-make', function () {
+    $name = trim(request('name', ''));
+    if (!$name) {
+        return response()->json(['success' => false, 'message' => 'El nombre de la marca es obligatorio.'], 422);
+    }
+    $make = \App\Models\VehicleMake::firstOrCreate(['name' => $name]);
+    return response()->json(['success' => true, 'id' => $make->id, 'name' => $make->name]);
+})->middleware('auth')->name('quick-add.make');
+
+Route::post('/_quick-add-model', function () {
+    $name = trim(request('name', ''));
+    $makeId = request('make_id');
+    if (!$name) {
+        return response()->json(['success' => false, 'message' => 'El nombre del modelo es obligatorio.'], 422);
+    }
+    if (!$makeId || !\App\Models\VehicleMake::find($makeId)) {
+        return response()->json(['success' => false, 'message' => 'La marca seleccionada no es válida.'], 422);
+    }
+    $model = \App\Models\VehicleModel::firstOrCreate([
+        'vehicle_make_id' => $makeId,
+        'name' => $name,
+    ]);
+    $model->load('make');
+    return response()->json(['success' => true, 'id' => $model->id, 'name' => $model->name, 'make_id' => $model->vehicle_make_id, 'make_name' => $model->make->name]);
+})->middleware('auth')->name('quick-add.model');
+
 require __DIR__.'/auth.php';
