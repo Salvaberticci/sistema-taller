@@ -32,6 +32,8 @@ class VehicleMakeSeeder extends Seeder
             'Yamaha (Motos)' => ['XTZ 125', 'XTZ 250', 'FZ 16', 'MT-03', 'MT-07', 'YZF-R3', 'YZF-R6', 'BWS 125'],
             'Empire (Motos)' => ['Horse 250', 'Rider 200', 'Cargo 250', 'Speed 200'],
             'Bera (Motos)' => ['Scooter 150', 'BR 200', 'Motorcycle 250'],
+            'Chery' => ['Tiggo 2', 'Tiggo 3', 'Tiggo 5', 'Tiggo 7', 'Tiggo 8', 'Arrizo 5', 'Arrizo 6', 'QQ', 'eQ1', 'iCar'],
+            'Mopad' => ['Magnum 125', 'Magnum 150', 'City 125', 'City 150', 'Sport 200', 'Cross 250'],
         ];
 
         foreach ($makes as $makeName => $models) {
