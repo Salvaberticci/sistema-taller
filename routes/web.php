@@ -140,13 +140,6 @@ Route::middleware('auth')->group(function () {
         Route::delete('/vehiculos/fotos/{photo}', [\App\Http\Controllers\VehicleController::class, 'destroyPhoto'])->name('vehicles.photos.destroy');
         Route::resource('/citas', \App\Http\Controllers\AppointmentController::class)->names('appointments')->parameters(['citas' => 'appointment']);
 
-        // Administración de inventario (crear, editar, eliminar repuestos)
-        Route::get('/inventario/create', [\App\Http\Controllers\PartController::class, 'create'])->name('inventory.create');
-        Route::post('/inventario/store', [\App\Http\Controllers\PartController::class, 'store'])->name('inventory.store');
-        Route::get('/inventario/{part}/edit', [\App\Http\Controllers\PartController::class, 'edit'])->name('inventory.edit');
-        Route::put('/inventario/{part}/update', [\App\Http\Controllers\PartController::class, 'update'])->name('inventory.update');
-        Route::delete('/inventario/{part}/destroy', [\App\Http\Controllers\PartController::class, 'destroy'])->name('inventory.destroy');
-
     });
 
     // ─── Rutas compartidas con Mecánico ───
@@ -163,6 +156,13 @@ Route::middleware('auth')->group(function () {
         // IA
         Route::get('/ai-chat', [\App\Http\Controllers\AIController::class, 'index'])->name('ai.chat');
         Route::post('/ai-chat/send', [\App\Http\Controllers\AIController::class, 'chat'])->name('ai.send');
+
+        // Administración de inventario (crear, editar, eliminar repuestos)
+        Route::get('/inventario/create', [\App\Http\Controllers\PartController::class, 'create'])->name('inventory.create');
+        Route::post('/inventario/store', [\App\Http\Controllers\PartController::class, 'store'])->name('inventory.store');
+        Route::get('/inventario/{part}/edit', [\App\Http\Controllers\PartController::class, 'edit'])->name('inventory.edit');
+        Route::put('/inventario/{part}/update', [\App\Http\Controllers\PartController::class, 'update'])->name('inventory.update');
+        Route::delete('/inventario/{part}/destroy', [\App\Http\Controllers\PartController::class, 'destroy'])->name('inventory.destroy');
 
         // Inventario (solo lectura)
         Route::get('/inventario', [\App\Http\Controllers\PartController::class, 'index'])->name('inventory.index');
