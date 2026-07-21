@@ -114,7 +114,10 @@ Route::middleware('auth')->group(function () {
         Route::patch('/pagos/{payment}/confirmar', [\App\Http\Controllers\InvoiceController::class, 'confirmPayment'])->name('payments.confirm');
         Route::patch('/pagos/{payment}/rechazar', [\App\Http\Controllers\InvoiceController::class, 'rejectPayment'])->name('payments.reject');
         Route::get('/pagos/historial', [\App\Http\Controllers\InvoiceController::class, 'paymentHistory'])->name('payments.history');
+    });
 
+    // ─── Rutas compartidas: Administrador y Recepcionista ───
+    Route::middleware('role:admin,receptionist')->group(function () {
         // Todos los reportes PDF
         Route::get('/reportes/dashboard', [\App\Http\Controllers\ReportController::class, 'dashboard'])->name('reports.dashboard');
         Route::get('/reportes/inventario', [\App\Http\Controllers\ReportController::class, 'inventory'])->name('reports.inventory');
@@ -125,10 +128,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/reportes/vehiculos', [\App\Http\Controllers\ReportController::class, 'vehicles'])->name('reports.vehicles');
         Route::get('/reportes/agenda', [\App\Http\Controllers\ReportController::class, 'appointments'])->name('reports.appointments');
         Route::get('/reportes/factura/{invoice}', [\App\Http\Controllers\ReportController::class, 'invoice'])->name('reports.invoice');
-    });
 
-    // ─── Rutas compartidas: Administrador y Recepcionista ───
-    Route::middleware('role:admin,receptionist')->group(function () {
+
         // Personal (solo admin puede crear/editar administradores)
         Route::resource('/personal', \App\Http\Controllers\StaffController::class)->names('staff')->parameters(['personal' => 'staff']);
 
