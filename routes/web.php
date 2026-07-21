@@ -115,13 +115,6 @@ Route::middleware('auth')->group(function () {
         Route::patch('/pagos/{payment}/rechazar', [\App\Http\Controllers\InvoiceController::class, 'rejectPayment'])->name('payments.reject');
         Route::get('/pagos/historial', [\App\Http\Controllers\InvoiceController::class, 'paymentHistory'])->name('payments.history');
 
-        // Escritura de Inventario (crear, editar, eliminar repuestos)
-        Route::get('/inventario/create', [\App\Http\Controllers\PartController::class, 'create'])->name('inventory.create');
-        Route::post('/inventario/store', [\App\Http\Controllers\PartController::class, 'store'])->name('inventory.store');
-        Route::get('/inventario/{part}/edit', [\App\Http\Controllers\PartController::class, 'edit'])->name('inventory.edit');
-        Route::put('/inventario/{part}/update', [\App\Http\Controllers\PartController::class, 'update'])->name('inventory.update');
-        Route::delete('/inventario/{part}/destroy', [\App\Http\Controllers\PartController::class, 'destroy'])->name('inventory.destroy');
-
         // Todos los reportes PDF
         Route::get('/reportes/dashboard', [\App\Http\Controllers\ReportController::class, 'dashboard'])->name('reports.dashboard');
         Route::get('/reportes/inventario', [\App\Http\Controllers\ReportController::class, 'inventory'])->name('reports.inventory');
@@ -144,6 +137,13 @@ Route::middleware('auth')->group(function () {
         Route::post('/vehiculos/{vehicle}/fotos', [\App\Http\Controllers\VehicleController::class, 'storePhotos'])->name('vehicles.photos.store');
         Route::delete('/vehiculos/fotos/{photo}', [\App\Http\Controllers\VehicleController::class, 'destroyPhoto'])->name('vehicles.photos.destroy');
         Route::resource('/citas', \App\Http\Controllers\AppointmentController::class)->names('appointments')->parameters(['citas' => 'appointment']);
+
+        // Administración de inventario (crear, editar, eliminar repuestos)
+        Route::get('/inventario/create', [\App\Http\Controllers\PartController::class, 'create'])->name('inventory.create');
+        Route::post('/inventario/store', [\App\Http\Controllers\PartController::class, 'store'])->name('inventory.store');
+        Route::get('/inventario/{part}/edit', [\App\Http\Controllers\PartController::class, 'edit'])->name('inventory.edit');
+        Route::put('/inventario/{part}/update', [\App\Http\Controllers\PartController::class, 'update'])->name('inventory.update');
+        Route::delete('/inventario/{part}/destroy', [\App\Http\Controllers\PartController::class, 'destroy'])->name('inventory.destroy');
 
         // Administración de órdenes (crear, editar, eliminar, items)
         Route::get('/ordenes/crear/nueva', [\App\Http\Controllers\ServiceOrderController::class, 'create'])->name('orders.create');

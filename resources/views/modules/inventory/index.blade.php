@@ -7,24 +7,19 @@
                     </h2>
                     <p class="text-slate-400 text-sm mt-1">Control de stock, alertas y proveedores.</p>
                 </div>
-                @php $isAdmin = Auth::user()->role === 'admin'; @endphp
                 <div class="flex gap-3">
-                    @if($isAdmin)
                     <a href="{{ route('reports.inventory') }}" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-500/20 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                         </svg>
                         Generar Reporte
                     </a>
-                    @endif
-                    @if($isAdmin)
                     <a href="{{ route('inventory.create') }}" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-500/20 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
                         </svg>
                         Nuevo Repuesto
                     </a>
-                    @endif
                 </div>
             </div>
     </x-slot>
@@ -90,14 +85,11 @@
                                 <td class="px-6 py-4">@money($part->price)</td>
                                 <td class="px-6 py-4">
                                     <div class="flex justify-center gap-3">
-                                        @if($isAdmin)
                                         <a href="{{ route('inventory.edit', $part) }}" class="text-slate-400 hover:text-white">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                 <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                                             </svg>
                                         </a>
-                                        @endif
-                                        @if($isAdmin)
                                         <form action="{{ route('inventory.destroy', $part) }}" method="POST" onsubmit="return confirm('¿Estás seguro?')">
                                             @csrf @method('DELETE')
                                             <button type="submit" class="text-slate-400 hover:text-red-500">
@@ -106,7 +98,6 @@
                                                 </svg>
                                             </button>
                                         </form>
-                                        @endif
                                     </div>
                                 </td>
                             </tr>

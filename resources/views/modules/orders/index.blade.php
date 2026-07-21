@@ -7,16 +7,13 @@
                     </h2>
                     <p class="text-slate-400 text-sm mt-1">Control de flujo y estados de reparación.</p>
                 </div>
-                @php $isAdmin = in_array(Auth::user()->role, ['admin']); @endphp
                 <div class="flex gap-3">
-                    @if($isAdmin)
                     <a href="{{ route('reports.orders') }}" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-500/20 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                         </svg>
                         Generar Reporte
                     </a>
-                    @endif
                     <a href="{{ route('orders.create') }}" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-500/20 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
@@ -61,16 +58,14 @@
                                 @money($order->total_amount)
                             </div>
                             <div class="flex items-center gap-2">
-                                @if($isAdmin)
-                                    @if($order->invoice)
-                                        <a href="{{ route('invoices.show', $order->invoice) }}" class="px-4 py-2 bg-green-600/10 hover:bg-green-600/20 text-xs font-bold text-green-500 rounded-lg transition-colors border border-green-500/20">Ver Factura</a>
-                                    @else
-                                        <form action="{{ route('invoices.store') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="service_order_id" value="{{ $order->id }}">
-                                            <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-xs font-bold text-white rounded-lg transition-colors shadow-lg shadow-blue-500/20">Generar Factura</button>
-                                        </form>
-                                    @endif
+                                @if($order->invoice)
+                                    <a href="{{ route('invoices.show', $order->invoice) }}" class="px-4 py-2 bg-green-600/10 hover:bg-green-600/20 text-xs font-bold text-green-500 rounded-lg transition-colors border border-green-500/20">Ver Factura</a>
+                                @else
+                                    <form action="{{ route('invoices.store') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="service_order_id" value="{{ $order->id }}">
+                                        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-xs font-bold text-white rounded-lg transition-colors shadow-lg shadow-blue-500/20">Generar Factura</button>
+                                    </form>
                                 @endif
                                 <a href="{{ route('orders.show', $order->id) }}" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 rounded-lg transition-colors border border-slate-700">Ver Detalles</a>
                             </div>
