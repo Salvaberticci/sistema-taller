@@ -147,6 +147,10 @@ Route::middleware('auth')->group(function () {
         Route::put('/inventario/{part}/update', [\App\Http\Controllers\PartController::class, 'update'])->name('inventory.update');
         Route::delete('/inventario/{part}/destroy', [\App\Http\Controllers\PartController::class, 'destroy'])->name('inventory.destroy');
 
+    });
+
+    // ─── Rutas compartidas con Mecánico ───
+    Route::middleware('role:admin,receptionist,mechanic')->group(function () {
         // Administración de órdenes (crear, editar, eliminar, items)
         Route::get('/ordenes/crear/nueva', [\App\Http\Controllers\ServiceOrderController::class, 'create'])->name('orders.create');
         Route::post('/ordenes/guardar', [\App\Http\Controllers\ServiceOrderController::class, 'store'])->name('orders.store');
@@ -155,10 +159,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/ordenes/{order}/eliminar', [\App\Http\Controllers\ServiceOrderController::class, 'destroy'])->name('orders.destroy');
         Route::post('/ordenes/{order}/items', [\App\Http\Controllers\ServiceOrderController::class, 'addItem'])->name('orders.addItem');
         Route::delete('/ordenes/items/{workItem}', [\App\Http\Controllers\ServiceOrderController::class, 'removeItem'])->name('orders.removeItem');
-    });
 
-    // ─── Rutas accesibles por todos los roles ───
-    Route::middleware('role:admin,receptionist,mechanic')->group(function () {
         // IA
         Route::get('/ai-chat', [\App\Http\Controllers\AIController::class, 'index'])->name('ai.chat');
         Route::post('/ai-chat/send', [\App\Http\Controllers\AIController::class, 'chat'])->name('ai.send');
