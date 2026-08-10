@@ -15,7 +15,7 @@
     <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
         <div class="premium-card rounded-[2.5rem] p-8 shadow-2xl border border-slate-700 bg-slate-800/50">
             <form action="{{ route('inventory.update', $part) }}" method="POST" class="space-y-6">
-                @csrf @method('PATCH')
+                @csrf @method('PUT')
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="md:col-span-2">
                         <x-input-label for="name" :value="__('Nombre del Repuesto')" />
