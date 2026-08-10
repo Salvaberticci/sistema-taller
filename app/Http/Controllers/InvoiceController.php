@@ -45,6 +45,44 @@ class InvoiceController extends Controller
         return redirect()->route('invoices.show', $invoice)->with('status', 'Factura generada con éxito.');
     }
 
+    public function edit(Invoice $invoice)
+    {
+        $invoice->load(['serviceOrder.customer', 'serviceOrder.vehicle']);
+        return view('modules.invoices.edit', compact('invoice'));
+    }
+
+    public function update(Request $request, Invoice $invoice)
+    {
+        $validated = $request->validate([
+            'total' => 'required|numeric|min:0',
+            'status' => 'required|in:unpaid,partially_paid,paid',
+            'issue_date' => 'required|date',
+        ], [
+            'total.required' => 'El total es obligatorio.',
+            'total.numeric' => 'El total debe ser un valor numérico.',
+            'total.min' => 'El total mínimo es 0.',
+            'status.required' => 'El estado es obligatorio.',
+            'status.in' => 'El estado seleccionado no es válido.',
+            'issue_date.required' => 'La fecha de emisión es obligatoria.',
+            'issue_date.date' => 'La fecha de emisión no es válida.',
+        ]);
+
+        $invoice->update([
+            'total' => $validated['total'],
+            'status' => $validated['status'],
+            'issue_date' => $validated['issue_date'],
+        ]);
+
+        return redirect()->route('invoices.show', $invoice)->with('status', 'Factura actualizada con éxito.');
+    }
+
+    public function destroy(Invoice $invoice)
+    {
+        $invoice->payments()->delete();
+        $invoice->delete();
+        return redirect()->route('invoices.index')->with('status', 'Factura eliminada con éxito.');
+    }
+
     public function addPayment(Request $request, Invoice $invoice)
     {
         $validated = $request->validate([
