@@ -31,8 +31,8 @@ class InvoiceController extends Controller
 
         $order = ServiceOrder::findOrFail($validated['service_order_id']);
         
-        // Generate invoice number
-        $number = 'FAC-' . now()->format('Y') . '-' . str_pad(Invoice::count() + 1, 4, '0', STR_PAD_LEFT);
+        // Generate invoice number using max ID (never reused, safe after deletions)
+        $number = 'FAC-' . now()->format('Y') . '-' . str_pad((Invoice::max('id') ?? 0) + 1, 4, '0', STR_PAD_LEFT);
 
         $invoice = Invoice::create([
             'service_order_id' => $order->id,
