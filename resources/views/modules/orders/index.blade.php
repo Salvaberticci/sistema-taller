@@ -68,6 +68,11 @@
                                     </form>
                                 @endif
                                 <a href="{{ route('orders.show', $order->id) }}" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 rounded-lg transition-colors border border-slate-700">Ver Detalles</a>
+                                <a href="{{ route('orders.edit', $order) }}" class="px-4 py-2 bg-yellow-600/10 hover:bg-yellow-600/20 text-xs font-bold text-yellow-500 rounded-lg transition-colors border border-yellow-500/20">Editar</a>
+                                <form action="{{ route('orders.destroy', $order) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar esta orden? Esta acción no se puede deshacer.')">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="px-4 py-2 bg-red-600/10 hover:bg-red-600/20 text-xs font-bold text-red-500 rounded-lg transition-colors border border-red-500/20">Eliminar</button>
+                                </form>
                             </div>
                         </div>
                     </div>

@@ -52,6 +52,42 @@ class ServiceOrderController extends Controller
         return view('modules.orders.show', compact('order', 'parts'));
     }
 
+    public function edit(ServiceOrder $order)
+    {
+        $customers = Customer::with('vehicles')->orderBy('name')->get();
+        $mechanics = User::where('role', 'mecanico')->orWhere('role', 'mechanic')->orderBy('name')->get();
+        $order->load(['customer', 'vehicle']);
+        return view('modules.orders.edit', compact('order', 'customers', 'mechanics'));
+    }
+
+    public function update(Request $request, ServiceOrder $order)
+    {
+        $validated = $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'vehicle_id' => 'required|exists:vehicles,id',
+            'description' => 'required|string',
+            'estimated_total' => 'nullable|numeric',
+            'status' => 'required|in:pending,in_progress,completed,cancelled',
+        ]);
+
+        $order->update([
+            'customer_id' => $validated['customer_id'],
+            'vehicle_id' => $validated['vehicle_id'],
+            'description' => $validated['description'],
+            'status' => $validated['status'],
+            'total_amount' => $validated['estimated_total'] ?? $order->total_amount,
+        ]);
+
+        return redirect()->route('orders.index')->with('status', 'Orden #OT-'.$order->id.' actualizada con éxito.');
+    }
+
+    public function destroy(ServiceOrder $order)
+    {
+        $order->workItems()->delete();
+        $order->delete();
+        return redirect()->route('orders.index')->with('status', 'Orden #OT-'.$order->id.' eliminada con éxito.');
+    }
+
     public function addItem(Request $request, ServiceOrder $order)
     {
         $validated = $request->validate([
