@@ -3,7 +3,8 @@
 @section('content')
     @php
         $itemsTotal = $invoice->serviceOrder->workItems->sum('total');
-        $paidTotal = $invoice->payments->sum('amount');
+        $paidTotal = $invoice->payments->where('status', 'confirmado')->sum('amount');
+        $pendingTotal = $invoice->payments->where('status', 'pendiente')->sum('amount');
         $balance = $itemsTotal - $paidTotal;
     @endphp
     <div style="margin-bottom: 40px;">
@@ -70,6 +71,12 @@
                 <td style="border: none;" class="font-bold text-green-400">Total Pagado:</td>
                 <td style="border: none;" class="text-right font-bold text-green-400">${{ number_format($paidTotal, 2) }}</td>
             </tr>
+            @if($pendingTotal > 0)
+            <tr>
+                <td style="border: none;" class="font-bold text-yellow-500">Pagos Pendientes:</td>
+                <td style="border: none;" class="text-right font-bold text-yellow-500">${{ number_format($pendingTotal, 2) }}</td>
+            </tr>
+            @endif
             <tr style="border-top: 2px solid #2563eb;">
                 <td style="border: none; font-size: 16px;" class="font-bold">SALDO:</td>
                 <td style="border: none; font-size: 16px;" class="text-right font-bold">${{ number_format($balance, 2) }}</td>

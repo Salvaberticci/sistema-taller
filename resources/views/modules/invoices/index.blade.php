@@ -48,7 +48,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             @php
                 $totalInvoiced = $invoices->sum('display_total');
-                $totalPaid = $invoices->flatMap->payments->sum('amount');
+                $totalPaid = $invoices->flatMap->payments->where('status', 'confirmado')->sum('amount');
                 $pending = $totalInvoiced - $totalPaid;
             @endphp
             <div class="premium-card p-8 rounded-[2.5rem] bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 shadow-2xl relative overflow-hidden">

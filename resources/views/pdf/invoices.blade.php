@@ -17,7 +17,7 @@
         <tbody>
             @foreach($invoices as $invoice)
                 @php
-                    $paid = $invoice->payments->sum('amount');
+                    $paid = $invoice->payments->where('status', 'confirmado')->sum('amount');
                     $itemsTotal = $invoice->serviceOrder->workItems->sum('total');
                 @endphp
                 <tr>
@@ -46,7 +46,7 @@
         <h3>Resumen de Caja</h3>
         @php 
             $totalInvoiced = $invoices->sum(fn($i) => $i->serviceOrder->workItems->sum('total'));
-            $totalPaid = $invoices->flatMap->payments->sum('amount');
+            $totalPaid = $invoices->flatMap->payments->where('status', 'confirmado')->sum('amount');
         @endphp
         <table>
             <tr>
