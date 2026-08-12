@@ -84,6 +84,9 @@ class ReportController extends Controller
         $invoice->load(['serviceOrder.customer', 'serviceOrder.vehicle', 'serviceOrder.workItems', 'payments']);
         $rate = CurrencyService::getBcvRate();
         $pdf = Pdf::loadView('pdf.invoice-detail', compact('invoice', 'rate'));
-        return $pdf->stream('factura-' . $invoice->number . '.pdf');
+
+        return $pdf->stream('factura-' . $invoice->number . '.pdf')
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache');
     }
 }
