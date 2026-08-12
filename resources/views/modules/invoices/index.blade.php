@@ -47,7 +47,7 @@
         <!-- Finance Overview -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             @php
-                $totalInvoiced = $invoices->sum('display_total');
+                $totalInvoiced = $invoices->sum('total');
                 $totalPaid = $invoices->flatMap->payments->where('status', 'confirmado')->sum('amount');
                 $pending = $totalInvoiced - $totalPaid;
             @endphp
@@ -125,7 +125,7 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-sm text-slate-500">{{ $invoice->issue_date }}</td>
-                                <td class="px-6 py-4">@money($invoice->display_total)</td>
+                                <td class="px-6 py-4">@money($invoice->total)</td>
                                 <td class="px-6 py-4">
                                     @php
                                         $sConfig = match($invoice->status) {

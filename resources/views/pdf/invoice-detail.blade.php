@@ -2,7 +2,7 @@
 
 @section('content')
     @php
-        $itemsTotal = $invoice->serviceOrder->workItems->sum('total');
+        $itemsTotal = $invoice->total;
         $paidTotal = $invoice->payments->where('status', 'confirmado')->sum('amount');
         $pendingTotal = $invoice->payments->where('status', 'pendiente')->sum('amount');
         $balance = $itemsTotal - $paidTotal;
