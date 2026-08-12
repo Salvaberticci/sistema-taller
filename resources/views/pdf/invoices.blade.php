@@ -16,7 +16,10 @@
         </thead>
         <tbody>
             @foreach($invoices as $invoice)
-                @php $paid = $invoice->payments->sum('amount'); @endphp
+                @php
+                    $paid = $invoice->payments->sum('amount');
+                    $itemsTotal = $invoice->serviceOrder->workItems->sum('total');
+                @endphp
                 <tr>
                     <td class="font-bold">{{ $invoice->number }}</td>
                     <td>{{ $invoice->serviceOrder->customer->name }}</td>
@@ -27,8 +30,8 @@
                         </span>
                     </td>
                     <td class="text-right">
-                        ${{ number_format($invoice->total, 2) }}<br>
-                        <span style="font-size: 8px; color: #64748b;">Bs. {{ number_format($invoice->total * $rate, 2) }}</span>
+                        ${{ number_format($itemsTotal, 2) }}<br>
+                        <span style="font-size: 8px; color: #64748b;">Bs. {{ number_format($itemsTotal * $rate, 2) }}</span>
                     </td>
                     <td class="text-right">
                         ${{ number_format($paid, 2) }}<br>
@@ -42,7 +45,7 @@
     <div class="summary-box">
         <h3>Resumen de Caja</h3>
         @php 
-            $totalInvoiced = $invoices->sum('total');
+            $totalInvoiced = $invoices->sum(fn($i) => $i->serviceOrder->workItems->sum('total'));
             $totalPaid = $invoices->flatMap->payments->sum('amount');
         @endphp
         <table>

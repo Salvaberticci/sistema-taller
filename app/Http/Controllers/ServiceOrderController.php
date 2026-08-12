@@ -119,6 +119,18 @@ class ServiceOrderController extends Controller
         // Update order total
         $order->increment('total_amount', $total);
 
+        // Sync invoice total if the order already has one
+        if ($order->invoice) {
+            $invoice = $order->invoice;
+            $invoice->update(['total' => $order->total_amount]);
+            $paid = $invoice->payments()->where('status', 'confirmado')->sum('amount');
+            if ($paid >= $invoice->total) {
+                $invoice->update(['status' => 'paid']);
+            } elseif ($paid > 0) {
+                $invoice->update(['status' => 'partially_paid']);
+            }
+        }
+
         return back()->with('status', 'Item añadido correctamente.');
     }
 
@@ -137,6 +149,20 @@ class ServiceOrderController extends Controller
 
         $workItem->delete();
         $order->decrement('total_amount', $total);
+
+        // Sync invoice total if the order has one
+        if ($order->invoice) {
+            $invoice = $order->invoice;
+            $invoice->update(['total' => $order->total_amount]);
+            $paid = $invoice->payments()->where('status', 'confirmado')->sum('amount');
+            if ($paid >= $invoice->total) {
+                $invoice->update(['status' => 'paid']);
+            } elseif ($paid > 0) {
+                $invoice->update(['status' => 'partially_paid']);
+            } else {
+                $invoice->update(['status' => 'unpaid']);
+            }
+        }
 
         return back()->with('status', 'Item eliminado.');
     }

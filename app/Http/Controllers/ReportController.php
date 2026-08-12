@@ -31,7 +31,7 @@ class ReportController extends Controller
 
     public function invoices()
     {
-        $invoices = Invoice::with(['serviceOrder.customer'])->latest()->get();
+        $invoices = Invoice::with(['serviceOrder.customer', 'serviceOrder.workItems', 'payments'])->latest()->get();
         $rate = CurrencyService::getBcvRate();
         $pdf = Pdf::loadView('pdf.invoices', compact('invoices', 'rate'));
         return $pdf->download('reporte-facturas-' . now()->format('d-m-Y') . '.pdf');
@@ -81,7 +81,7 @@ class ReportController extends Controller
     // Individual report for an invoice (the actual invoice)
     public function invoice(Invoice $invoice)
     {
-        $invoice->load(['serviceOrder.customer', 'serviceOrder.vehicle', 'payments']);
+        $invoice->load(['serviceOrder.customer', 'serviceOrder.vehicle', 'serviceOrder.workItems', 'payments']);
         $rate = CurrencyService::getBcvRate();
         $pdf = Pdf::loadView('pdf.invoice-detail', compact('invoice', 'rate'));
         return $pdf->stream('factura-' . $invoice->number . '.pdf');

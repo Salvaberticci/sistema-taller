@@ -59,7 +59,7 @@
                     <div class="border-t border-slate-700 pt-8 mt-8">
                         <div class="flex justify-between items-center mb-4">
                             <span class="text-slate-400 font-bold">Concepto: Orden de Trabajo #{{ $invoice->service_order_id }}</span>
-                            <div class="text-white font-black text-xl">@money($invoice->total)</div>
+                            <div class="text-white font-black text-xl">@money($itemsTotal)</div>
                         </div>
                         @php
                             $totalConfirmed = $invoice->payments->where('status', 'confirmado')->sum('amount');
@@ -69,7 +69,7 @@
                         <div class="bg-slate-900/50 rounded-2xl p-6 mt-8">
                             <div class="flex justify-between items-center text-sm mb-2">
                                 <span class="text-slate-500 uppercase font-bold tracking-widest">Total Factura</span>
-                                <span class="text-white font-bold">@money($invoice->total)</span>
+                                <span class="text-white font-bold">@money($itemsTotal)</span>
                             </div>
                             <div class="flex justify-between items-center text-sm mb-2">
                                 <span class="text-slate-500 uppercase font-bold tracking-widest">Pagos Confirmados</span>
@@ -84,7 +84,7 @@
                             <div class="border-t border-slate-700 my-4"></div>
                             <div class="flex justify-between items-center">
                                 <span class="text-white font-black uppercase tracking-widest">Saldo Pendiente</span>
-                                <span class="text-2xl font-black text-white">@money($invoice->total - $totalConfirmed)</span>
+                                <span class="text-2xl font-black text-white">@money($itemsTotal - $totalConfirmed)</span>
                             </div>
                         </div>
                     </div>

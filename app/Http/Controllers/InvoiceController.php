@@ -12,15 +12,19 @@ class InvoiceController extends Controller
 {
     public function index()
     {
-        $invoices = Invoice::with(['serviceOrder.customer', 'payments'])->latest()->get();
+        $invoices = Invoice::with(['serviceOrder.customer', 'serviceOrder.workItems', 'payments'])->latest()->get();
+        $invoices->each(function ($invoice) {
+            $invoice->display_total = $invoice->serviceOrder->workItems->sum('total');
+        });
         $bcvRate = CurrencyService::getBcvRate();
         return view('modules.invoices.index', compact('invoices', 'bcvRate'));
     }
 
     public function show(Invoice $invoice)
     {
-        $invoice->load(['serviceOrder.customer', 'serviceOrder.vehicle', 'payments']);
-        return view('modules.invoices.show', compact('invoice'));
+        $invoice->load(['serviceOrder.customer', 'serviceOrder.vehicle', 'serviceOrder.workItems', 'payments']);
+        $itemsTotal = $invoice->serviceOrder->workItems->sum('total');
+        return view('modules.invoices.show', compact('invoice', 'itemsTotal'));
     }
 
     public function store(Request $request)

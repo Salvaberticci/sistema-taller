@@ -1,6 +1,11 @@
 @extends('pdf.layout')
 
 @section('content')
+    @php
+        $itemsTotal = $invoice->serviceOrder->workItems->sum('total');
+        $paidTotal = $invoice->payments->sum('amount');
+        $balance = $itemsTotal - $paidTotal;
+    @endphp
     <div style="margin-bottom: 40px;">
         <div style="float: left; width: 50%;">
             <h2 style="margin: 0; color: #2563eb;">FACTURA</h2>
@@ -59,15 +64,15 @@
         <table style="border: none;">
             <tr>
                 <td style="border: none;" class="font-bold">Total Factura:</td>
-                <td style="border: none;" class="text-right font-bold">${{ number_format($invoice->total, 2) }}</td>
+                <td style="border: none;" class="text-right font-bold">${{ number_format($itemsTotal, 2) }}</td>
             </tr>
             <tr>
                 <td style="border: none;" class="font-bold text-green-400">Total Pagado:</td>
-                <td style="border: none;" class="text-right font-bold text-green-400">${{ number_format($invoice->payments->sum('amount'), 2) }}</td>
+                <td style="border: none;" class="text-right font-bold text-green-400">${{ number_format($paidTotal, 2) }}</td>
             </tr>
             <tr style="border-top: 2px solid #2563eb;">
                 <td style="border: none; font-size: 16px;" class="font-bold">SALDO:</td>
-                <td style="border: none; font-size: 16px;" class="text-right font-bold">${{ number_format($invoice->total - $invoice->payments->sum('amount'), 2) }}</td>
+                <td style="border: none; font-size: 16px;" class="text-right font-bold">${{ number_format($balance, 2) }}</td>
             </tr>
         </table>
     </div>
@@ -76,7 +81,7 @@
     <div class="summary-box" style="margin-top: 50px;">
         <p style="font-size: 10px; color: #666;"><strong>Equivalente en Bolívares:</strong></p>
         <p style="font-size: 18px; font-weight: black; color: #1e293b; margin: 5px 0;">
-            Bs. {{ number_format($invoice->total * $rate, 2) }}
+            Bs. {{ number_format($itemsTotal * $rate, 2) }}
         </p>
         <p class="bcv-rate">Calculado a tasa BCV de Bs. {{ number_format($rate, 2) }}</p>
     </div>
